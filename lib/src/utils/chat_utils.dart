@@ -49,15 +49,15 @@ Future<int?> replyWithButtons(
 
 InlineKeyboardMarkup createButtons(List<InlineButton> buttons) {
   return InlineKeyboardMarkup(
-    inlineKeyboard: [
-      buttons
-          .map((button) => _createButton(
+    inlineKeyboard: buttons
+        .map((button) => [
+              _createButton(
                 title: button.title,
                 callbackData: button.nextStepUri,
                 url: button.externalUrl,
-              ))
-          .toList(),
-    ],
+              )
+            ])
+        .toList(),
   );
 }
 

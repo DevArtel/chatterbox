@@ -16,18 +16,44 @@ Can be used with both webhook and polling.
 
 ```dart
 @CloudFunction()
-Future<void> function(Map<String, dynamic> updateJson) async {
-  setTranslations(translations); //todo this is rubbish
+Future<Response> function(Map<String, dynamic> updateJson) async {
+  try {
+    final flows = <Flow>[
+      //todo
+    ];
 
-  SharedDatabase.initialize();
-  final store = ChatterboxStoreProxy(SharedDatabase.createDialogDao());
-  final flows = <Flow>[
-    LoginFlow(SharedDatabase.createTokenDao()),
-  ];
-
-  Chatterbox(SharedConfig.botToken, flows, store).invokeFromWebhook(updateJson);
+    Chatterbox(Config.botToken, flows, StoreProxy()).invokeFromWebhook(updateJson);
+    return Response.ok(
+      null,
+      headers: {'Content-Type': 'application/json'},
+    );
+  } catch (error) {
+    return Response.badRequest();
+  }
 }
 ```
 
-## Additional information
+## Coding dialog flows
+
+### Creating Flows
+
+### Reacting to user input
+
+[ReactionResponse] is a simple reaction that allows to respond with a test to user input
+```dart
+ReactionResponse(
+  /// Required text message to reply to user
+  text: 'What is your favorite number?',
+  /// Optional buttons
+  buttons: [
+    InlineButton(
+      /// Button text
+      title: 'Seventy three',
+      /// Uri of a step to be invoked when this button is pressed
+      nextStepUri: NextStep.toStepUri().appendArgs('73')
+    ),
+  ],
+);
+```
+It can also contain buttons
 
