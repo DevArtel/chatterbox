@@ -36,6 +36,7 @@ class BotFacadeImpl extends BotFacade {
 
   @override
   Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons) async {
+    _verifyButtons(buttons);
     if (editMessageId == null) {
       print("[ChatUtils] replyWithButtons new message");
       return sendMessage(chatId, text, replyMarkup: createButtons(buttons));
@@ -48,5 +49,13 @@ class BotFacadeImpl extends BotFacade {
   @override
   Future<int> sendInvoice(fromId, SuccessfulPayment paymentInvoiceInfo) {
     throw 'Not implemented';
+  }
+}
+
+void _verifyButtons(List<InlineButton> buttons) {
+  for (var element in buttons) {
+    if (element.externalUrl?.isNotEmpty != true && element.nextStepUri?.isNotEmpty != true) {
+      throw 'Button ${element.title} must have one of the properties externalUrl or nextStepUri';
+    }
   }
 }
