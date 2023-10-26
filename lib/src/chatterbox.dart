@@ -72,7 +72,7 @@ class Chatterbox {
     flowManager.handle(
       null,
       MessageContext(userId: id, chatId: id, username: message.from?.username),
-      flow.initialStep.id.appendArgs(args),
+      flow.initialStep.uri.appendArgs(args),
     );
   }
 

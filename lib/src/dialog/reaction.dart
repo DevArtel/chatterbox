@@ -10,9 +10,16 @@ sealed class Reaction {
 }
 
 class ReactionResponse extends Reaction {
+  /// Text to send to user
   final String text;
+
+  /// Instead of sending new message to user this message will be updated
   final int? editMessageId;
+
+  /// Buttons to display to user
   final List<InlineButton> buttons;
+
+  /// This step will be invoked after user reply with user message passed as param
   final String? afterReplyUri;
 
   ReactionResponse({
@@ -48,10 +55,12 @@ class ReactionInvoice extends Reaction {
   }) : super(postCallback);
 }
 
+/// Return None to ignore user input
 class ReactionNone extends Reaction {
   ReactionNone() : super(null);
 }
 
+/// Use this when you want bot to talk to other user
 class ReactionForeignResponse extends Reaction {
   final int foreignUserId;
   final String text;
@@ -81,5 +90,5 @@ class ReactionComposed extends Reaction {
 }
 
 FlowStep? findById(List<FlowStep> steps, String stepId) {
-  return steps.firstWhereOrNull((step) => step.id == stepId);
+  return steps.firstWhereOrNull((step) => step.uri == stepId);
 }
