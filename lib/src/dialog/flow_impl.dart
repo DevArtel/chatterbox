@@ -118,7 +118,7 @@ class FlowManagerImpl implements FlowManager {
       //     );
       //     return messageResult.first?.body()?.result?.messageId;
       //   }(),
-      (ReactionNone) => null,
+      // (ReactionNone) => null,
       (ReactionForeignResponse reactionForeignResponse) =>
         // final reactionForeignResponse = result as ReactionForeignResponse;
         bot.replyWithButtons(

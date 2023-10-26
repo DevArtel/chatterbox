@@ -50,7 +50,7 @@ class Chatterbox {
     print('[Chatterbox] Received update from webhook: $updateJson');
     try {
       bot.handleUpdate(Update.fromJson(updateJson));
-    } catch (error, st) {
+    } catch (error) {
       print('[Chatterbox] invokeFromWebhook failed: ${error.toString()}');
     }
   }
