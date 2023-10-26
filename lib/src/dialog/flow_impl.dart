@@ -1,0 +1,139 @@
+import 'package:chatterbox/src/api/bot_facade.dart';
+import 'package:chatterbox/src/dialog/flow.dart';
+import 'package:chatterbox/src/dialog/reaction.dart';
+import 'package:chatterbox/src/storage/dialog_store.dart';
+import 'package:chatterbox/src/model/message_context.dart';
+import 'package:collection/collection.dart';
+import 'package:televerse/telegram.dart';
+
+abstract class FlowManager {
+  List<FlowStep> get allStepsByUri;
+
+  Future<bool> handle(Message? message, MessageContext messageContext, StepUri? stepUri);
+
+}
+
+typedef StepFactory = FlowStep Function();
+
+class FlowManagerImpl implements FlowManager {
+  final BotFacade bot;
+  final ChatterboxStore dialogDao;
+  final List<Flow> flows;
+
+  FlowManagerImpl(this.bot, this.dialogDao, this.flows);
+
+  @override
+  List<FlowStep> get allStepsByUri =>
+      flows.map((flow) => flow.steps).expand((steps) => steps).map((step) => step()).toList();
+
+  @override
+  Future<bool> handle(Message? message, MessageContext messageContext, StepUri? stepUri) async {
+    int userId = messageContext.userId;
+    int? editMessageId = messageContext.editMessageId;
+
+    print("Handle invoked $userId $editMessageId ${message?.text}");
+
+    String? pendingStepUrl = await dialogDao.retrievePending(userId);
+    var pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri); // Assuming FlowStep.fromUri is defined
+    var pendingStep = pendingData.$1;
+    var pendingArgs = pendingData.$2;
+
+    if (pendingStep == null && stepUri == null) {
+      String messageText = message?.text?.trim() ?? "empty message";
+      Flow? handlingFlow = flows.firstWhereOrNull((flow) => flow.willHandle(messageText, messageContext));
+      if (handlingFlow != null) {
+        processResult(handlingFlow.initialStep, [messageText], messageContext);
+        print("[FlowManager] Handle by ${handlingFlow.runtimeType}");
+        return true;
+      }
+      print("[FlowManager] Not handled");
+      return false;
+    } else if (pendingStep != null && stepUri != null) {
+      print("[FlowManager] illegal state: PENDING AND StepUri BOTH NOT NULL");
+      return false;
+    } else if (pendingStep != null) {
+      print("[FlowManager] Processing pending step");
+      List<String> args = message?.text?.trim() != null ? [message!.text!.trim()] : [];
+      List<String> allArgs = [...?pendingArgs, ...args];
+      processResult(pendingStep, allArgs, messageContext);
+      return true;
+    } else if (stepUri != null) {
+      var stepData = FlowStep.fromUri(stepUri, allStepsByUri); // Assuming FlowStep.fromUri is defined
+      var theStep = stepData.$1;
+      var args = stepData.$2;
+
+      if (theStep == null) {
+        print("[FlowManager] illegal state: COULD NOT FIND STEP FOR URI $stepUri");
+        return false;
+      } else {
+        print("[FlowManager] Processing step by callback");
+        processResult(theStep, args, messageContext);
+        return true;
+      }
+    }
+
+    print("[FlowManager] MISSING CASE OMG!");
+    return false;
+  }
+
+
+  Future<void> processResult(FlowStep flowStep, List<String>? args, MessageContext messageContext) async {
+    final reaction = await flowStep.handle(messageContext, args);
+    int? responseMessageId = await _react(reaction, messageContext);
+    reaction.postCallback?.call(responseMessageId);
+  }
+
+  Future<int?>  _react(Reaction result, MessageContext messageContext) async {
+    return switch (result) {
+      ReactionResponse reactionResponse =>
+        // final reactionResponse = ;
+        bot.replyWithButtons(
+          messageContext.userId,
+          reactionResponse.editMessageId,
+          reactionResponse.text,
+          reactionResponse.buttons,
+        ),
+      (ReactionRedirect reactionRedirect) => () {
+          final stepData = FlowStep.fromUri(reactionRedirect.stepUri, allStepsByUri);
+          final step = stepData.$1;
+          final args = stepData.$2;
+          var text = reactionRedirect.text;
+          final sendMessageId = text != null
+              ? bot.replyWithButtons(
+                  messageContext.userId,
+                  reactionRedirect.editMessageId,
+                  text,
+                  [],
+                )
+              : null;
+          processResult(step!, args, messageContext);
+          return sendMessageId;
+        }(),
+      // (Invoice reactionInvoice) => () {
+      //     // final reactionInvoice = result as ReactionInvoice;
+      //     final messageResult = bot.sendInvoice(
+      //       reactionInvoice.userId,
+      //       // ChatId.fromId(reactionInvoice.userId),
+      //       reactionInvoice.paymentInvoiceInfo,
+      //     );
+      //     return messageResult.first?.body()?.result?.messageId;
+      //   }(),
+      (ReactionNone) => null,
+      (ReactionForeignResponse reactionForeignResponse) =>
+        // final reactionForeignResponse = result as ReactionForeignResponse;
+        bot.replyWithButtons(
+          reactionForeignResponse.foreignUserId,
+          reactionForeignResponse.editMessageId,
+          reactionForeignResponse.text,
+          reactionForeignResponse.buttons,
+        ),
+      (ReactionComposed reactionComposed) => () {
+          for (var response in reactionComposed.responses) {
+            _react(response, messageContext);
+          }
+          return null;
+        }(),
+      _ => throw Exception("Unknown Reaction type: ${result.runtimeType}"),
+    };
+  }
+}

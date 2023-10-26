@@ -1,0 +1,25 @@
+# See https://dart.dev/guides/libraries/private-files
+# Files and directories created by pub
+.dart_tool/
+.packages
+
+# Avoid committing pubspec.lock for library packages; see
+# https://dart.dev/guides/libraries/private-files#pubspeclock.
+pubspec.lock
+
+# Omit commiting pubspec.lock for library packages:
+# https://dart.dev/guides/libraries/private-files#pubspeclocklogin
+
+# Conventional directory for build outputs
+build/
+
+# Directory created by dartdoc
+doc/api/
+/.idea/
+
+# Environment
+/.keys/
+.env
+
+*.g.dart
+*.freezed.dart
