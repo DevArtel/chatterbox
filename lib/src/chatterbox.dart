@@ -39,6 +39,15 @@ class Chatterbox {
       },
     );
 
+    bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update,  (messageContext, stepUri) async {
+      print('[Chatterbox] Process callback query $stepUri');
+      flowManager.handle(
+        null,
+        messageContext,
+        stepUri,
+      );
+    }));
+
     print('[Chatterbox] constructor 3');
   }
 

@@ -47,9 +47,6 @@ void processCallbackQuery(Update update, UpdateStepHandler commandHandler) {
     final userId = chatId; // TODO: Test for groups. message.from.id returns id of opponent
     final data = callbackQuery.data;
 
-    print('[ACCOUNT_MANAGER_BOT] received callbackQuery from chat $chatId, data $data');
-
-    // commandHandler(MessageContext(userId, chatId, messageId, message.from?.username), data);
     commandHandler(
       MessageContext(
         userId: userId,
