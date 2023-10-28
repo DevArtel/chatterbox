@@ -1,8 +1,8 @@
 import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/dialog/flow.dart';
 import 'package:chatterbox/src/dialog/reaction.dart';
-import 'package:chatterbox/src/storage/dialog_store.dart';
 import 'package:chatterbox/src/model/message_context.dart';
+import 'package:chatterbox/src/storage/dialog_store.dart';
 import 'package:collection/collection.dart';
 import 'package:televerse/telegram.dart';
 
@@ -10,17 +10,16 @@ abstract class FlowManager {
   List<FlowStep> get allStepsByUri;
 
   Future<bool> handle(Message? message, MessageContext messageContext, StepUri? stepUri);
-
 }
 
 typedef StepFactory = FlowStep Function();
 
 class FlowManagerImpl implements FlowManager {
   final BotFacade bot;
-  final ChatterboxStore dialogDao;
+  final ChatterboxStore store;
   final List<Flow> flows;
 
-  FlowManagerImpl(this.bot, this.dialogDao, this.flows);
+  FlowManagerImpl(this.bot, this.store, this.flows);
 
   @override
   List<FlowStep> get allStepsByUri =>
@@ -33,7 +32,7 @@ class FlowManagerImpl implements FlowManager {
 
     print("Handle invoked $userId $editMessageId ${message?.text}");
 
-    String? pendingStepUrl = await dialogDao.retrievePending(userId);
+    String? pendingStepUrl = await store.retrievePending(userId);
     var pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri); // Assuming FlowStep.fromUri is defined
     var pendingStep = pendingData.$1;
     var pendingArgs = pendingData.$2;
@@ -76,23 +75,26 @@ class FlowManagerImpl implements FlowManager {
     return false;
   }
 
-
   Future<void> processResult(FlowStep flowStep, List<String>? args, MessageContext messageContext) async {
     final reaction = await flowStep.handle(messageContext, args);
     int? responseMessageId = await _react(reaction, messageContext);
     reaction.postCallback?.call(responseMessageId);
   }
 
-  Future<int?>  _react(Reaction result, MessageContext messageContext) async {
+  Future<int?> _react(Reaction result, MessageContext messageContext) async {
     return switch (result) {
-      ReactionResponse reactionResponse =>
-        // final reactionResponse = ;
-        bot.replyWithButtons(
-          messageContext.userId,
-          reactionResponse.editMessageId,
-          reactionResponse.text,
-          reactionResponse.buttons,
-        ),
+      ReactionResponse reactionResponse => () async {
+          final uri = result.afterReplyUri;
+          if (uri != null) {
+            await store.setPending(messageContext.userId, uri);
+          }
+          bot.replyWithButtons(
+            messageContext.userId,
+            reactionResponse.editMessageId,
+            reactionResponse.text,
+            reactionResponse.buttons,
+          );
+        }(),
       (ReactionRedirect reactionRedirect) => () {
           final stepData = FlowStep.fromUri(reactionRedirect.stepUri, allStepsByUri);
           final step = stepData.$1;

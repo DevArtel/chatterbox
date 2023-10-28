@@ -28,6 +28,7 @@ class Chatterbox {
         if (message.isCommand) {
           processCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process command $command');
+            await store.clearPending(messageContext.userId);
             _handleCommand(command, message, messageContext);
           });
         } else {
@@ -39,14 +40,14 @@ class Chatterbox {
       },
     );
 
-    bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update,  (messageContext, stepUri) async {
-      print('[Chatterbox] Process callback query $stepUri');
-      flowManager.handle(
-        null,
-        messageContext,
-        stepUri,
-      );
-    }));
+    bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update, (messageContext, stepUri) async {
+          print('[Chatterbox] Process callback query $stepUri');
+          flowManager.handle(
+            null,
+            messageContext,
+            stepUri,
+          );
+        }));
 
     print('[Chatterbox] constructor 3');
   }

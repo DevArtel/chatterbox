@@ -9,7 +9,7 @@ typedef UpdateStepHandler = Future<void> Function(MessageContext messageContext,
 
 void processText(Update update, UpdateMessageHandler commandHandler) {
   final message = update.message;
-  if (message != null && message.text?.startsWith('/') == true) {
+  if (message != null) {
     processTextInternal(message, commandHandler);
   }
 }

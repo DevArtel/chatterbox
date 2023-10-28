@@ -1,3 +1,6 @@
+## 1.0.3
+- Fix working with pending message
+
 ## 1.0.2
 - Introduce toStepUri() function, that is used to reference between steps
 - Process callback for InlineButtons
