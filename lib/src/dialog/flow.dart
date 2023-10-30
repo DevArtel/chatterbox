@@ -13,7 +13,7 @@ abstract class Flow {
 
   FlowStep get initialStep => steps.first();
 
-  bool willHandle(String? messageText, MessageContext messageContext) => false;
+  bool willHandle(MessageContext messageContext) => false;
 }
 
 typedef StepUri = String;
@@ -22,9 +22,12 @@ const delimiter = "^";
 const argsDelimiter = "-";
 
 extension StepUriExtensions on StepUri {
-  StepUri appendArgs(List<String> args) {
-    if (args.isEmpty) return this;
-    return "$this$delimiter${args.argsToPayload()}";
+  StepUri appendArgs([List<String>? args]) {
+    if (args != null && args.isNotEmpty == true) {
+      return "$this$delimiter${args.argsToPayload()}";
+    } else {
+      return this;
+    }
   }
 }
 

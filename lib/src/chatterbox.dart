@@ -34,7 +34,7 @@ class Chatterbox {
         } else {
           processText(ctx.update, (messageContext) async {
             print('[Chatterbox] Process text message: $message');
-            flowManager.handle(message, messageContext, null);
+            flowManager.handle(messageContext, null);
           });
         }
       },
@@ -43,7 +43,6 @@ class Chatterbox {
     bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update, (messageContext, stepUri) async {
           print('[Chatterbox] Process callback query $stepUri');
           flowManager.handle(
-            null,
             messageContext,
             stepUri,
           );
@@ -71,7 +70,6 @@ class Chatterbox {
     int id = message.chat.id;
 
     flowManager.handle(
-      null,
       MessageContext(userId: id, chatId: id, username: message.from?.username),
       flow.initialStep.uri.appendArgs(args),
     );

@@ -34,6 +34,7 @@ void processTextInternal(Message message, UpdateMessageHandler commandHandler) {
     chatId: chatId,
     editMessageId: message.messageId,
     username: user?.username,
+    text: message.text,
   ));
 }
 

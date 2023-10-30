@@ -4,12 +4,11 @@ import 'package:chatterbox/src/dialog/reaction.dart';
 import 'package:chatterbox/src/model/message_context.dart';
 import 'package:chatterbox/src/storage/dialog_store.dart';
 import 'package:collection/collection.dart';
-import 'package:televerse/telegram.dart';
 
 abstract class FlowManager {
   List<FlowStep> get allStepsByUri;
 
-  Future<bool> handle(Message? message, MessageContext messageContext, StepUri? stepUri);
+  Future<bool> handle(MessageContext messageContext, StepUri? stepUri);
 }
 
 typedef StepFactory = FlowStep Function();
@@ -26,22 +25,21 @@ class FlowManagerImpl implements FlowManager {
       flows.map((flow) => flow.steps).expand((steps) => steps).map((step) => step()).toList();
 
   @override
-  Future<bool> handle(Message? message, MessageContext messageContext, StepUri? stepUri) async {
+  Future<bool> handle(MessageContext messageContext, StepUri? stepUri) async {
     int userId = messageContext.userId;
     int? editMessageId = messageContext.editMessageId;
 
-    print("Handle invoked $userId $editMessageId ${message?.text}");
+    print("Handle invoked $userId $editMessageId ${messageContext.text}");
 
     String? pendingStepUrl = await store.retrievePending(userId);
-    var pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri); // Assuming FlowStep.fromUri is defined
+    var pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri);
     var pendingStep = pendingData.$1;
     var pendingArgs = pendingData.$2;
 
     if (pendingStep == null && stepUri == null) {
-      String messageText = message?.text?.trim() ?? "empty message";
-      Flow? handlingFlow = flows.firstWhereOrNull((flow) => flow.willHandle(messageText, messageContext));
+      Flow? handlingFlow = flows.firstWhereOrNull((flow) => flow.willHandle(messageContext));
       if (handlingFlow != null) {
-        processResult(handlingFlow.initialStep, [messageText], messageContext);
+        processResult(handlingFlow.initialStep, null, messageContext);
         print("[FlowManager] Handle by ${handlingFlow.runtimeType}");
         return true;
       }
@@ -52,9 +50,7 @@ class FlowManagerImpl implements FlowManager {
       return false;
     } else if (pendingStep != null) {
       print("[FlowManager] Processing pending step");
-      List<String> args = message?.text?.trim() != null ? [message!.text!.trim()] : [];
-      List<String> allArgs = [...?pendingArgs, ...args];
-      processResult(pendingStep, allArgs, messageContext);
+      processResult(pendingStep, pendingArgs, messageContext);
       return true;
     } else if (stepUri != null) {
       var stepData = FlowStep.fromUri(stepUri, allStepsByUri); // Assuming FlowStep.fromUri is defined

@@ -1,14 +1,23 @@
+import 'dart:ffi';
+
+import 'package:chatterbox/chatterbox.dart';
+
 const String _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.\$#";
 
 extension HashId on Type {
   /// Produces a short hash id for a given type
   //todo won't work for same _InitialStep
-  String toStepUri() {
+  String toStepUri([List<String>? args]) {
     final String name = toString();
     final int num = _decode(name, _alphabet);
     final String shortId = num.toRadixString(16);
     print("[HashIds] generate id $shortId for $name");
-    return shortId;
+
+    if (args != null) {
+      return (shortId).appendArgs(args);
+    } else {
+      return shortId;
+    }
   }
 }
 
