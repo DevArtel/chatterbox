@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:chatterbox/chatterbox.dart';
 
 const String _alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.\$#";
