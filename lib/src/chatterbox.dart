@@ -17,17 +17,14 @@ class Chatterbox {
   late final FlowManager flowManager;
 
   Chatterbox(String botToken, this.flows, this.store) : bot = Bot(botToken) {
-    print('[Chatterbox] constructor');
     flowManager = FlowManagerImpl(BotFacadeImpl(bot.api), store, flows);
-    print('[Chatterbox] constructor 2');
 
     bot.onText(
       (ctx) {
         final message = ctx.message;
-        print('[Chatterbox] on text ${message.text}');
         if (message.isCommand) {
           processCommand(ctx.update, (messageContext, command) async {
-            print('[Chatterbox] Process command $command');
+            print('[Chatterbox] Process command /$command');
             await store.clearPending(messageContext.userId);
             _handleCommand(command, message, messageContext);
           });
@@ -47,8 +44,6 @@ class Chatterbox {
             stepUri,
           );
         }));
-
-    print('[Chatterbox] constructor 3');
   }
 
   void startPolling() {
@@ -65,6 +60,7 @@ class Chatterbox {
   }
 
   void startFlowForMessage(Flow flow, Message message) {
+    print('[Chatterbox] startFlowForMessage: ${message.text}');
     // TODO: Encode these args, because if stepUri is an argument it's not parsed properly
     List<String> args = parseArgs(message.text);
     int id = message.chat.id;

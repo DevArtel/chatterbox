@@ -9,7 +9,7 @@ extension HashId on Type {
     final String name = toString();
     final int num = _decode(name, _alphabet);
     final String shortId = num.toRadixString(16);
-    print("[HashIds] generate id $shortId for $name");
+    // print("[HashIds] generate id $shortId for $name");
 
     if (args != null) {
       return (shortId).appendArgs(args);
