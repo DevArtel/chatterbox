@@ -125,9 +125,10 @@ class FlowManagerImpl implements FlowManager {
           reactionForeignResponse.text,
           reactionForeignResponse.buttons,
         ),
-      (ReactionComposed reactionComposed) => () {
+      (ReactionComposed reactionComposed) => () async {
           for (var response in reactionComposed.responses) {
             _react(response, messageContext);
+            await Future.delayed(Duration(milliseconds: 300));
           }
           return null;
         }(),
