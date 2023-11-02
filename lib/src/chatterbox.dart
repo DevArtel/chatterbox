@@ -1,8 +1,5 @@
+import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/api/bot_facade.dart';
-import 'package:chatterbox/src/dialog/flow.dart';
-import 'package:chatterbox/src/dialog/flow_impl.dart';
-import 'package:chatterbox/src/model/message_context.dart';
-import 'package:chatterbox/src/storage/dialog_store.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
 import 'package:chatterbox/src/utils/update_processing_utils.dart';
 import 'package:collection/collection.dart';
@@ -12,48 +9,73 @@ import 'package:televerse/televerse.dart' hide MessageContext;
 class Chatterbox {
   final List<Flow> flows;
 
-  final Bot bot;
-  final ChatterboxStore store;
-  late final FlowManager flowManager;
+  final Bot _bot;
+  final ChatterboxStore _store;
+  late final FlowManager _flowManager;
 
-  Chatterbox(String botToken, this.flows, this.store) : bot = Bot(botToken) {
-    flowManager = FlowManagerImpl(BotFacadeImpl(bot.api), store, flows);
+  Chatterbox(String botToken, this.flows, this._store) : _bot = Bot(botToken) {
+    _flowManager = FlowManagerImpl(BotFacadeImpl(_bot.api), _store, flows);
 
-    bot.onText(
+    _bot.onText(
       (ctx) {
         final message = ctx.message;
         if (message.isCommand) {
           processCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process command /$command');
-            await store.clearPending(messageContext.userId);
+            await _store.clearPending(messageContext.userId);
             _handleCommand(command, message, messageContext);
           });
         } else {
           processText(ctx.update, (messageContext) async {
             print('[Chatterbox] Process text message: $message');
-            flowManager.handle(messageContext, null);
+            _flowManager.handle(messageContext, null);
           });
         }
       },
     );
 
-    bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update, (messageContext, stepUri) async {
+    _bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update, (messageContext, stepUri) async {
           print('[Chatterbox] Process callback query $stepUri');
-          flowManager.handle(
+          _flowManager.handle(
             messageContext,
             stepUri,
           );
         }));
+
+    _bot.onPhoto((ctx) => processPhoto(ctx.update, (messageContext) async {
+          print('[Chatterbox] on photo, count: ${messageContext.mediaFiles?.length ?? 0}');
+          _flowManager.handle(messageContext);
+        }));
+
+    _bot.onVideo((ctx) => processVideo(ctx.update, (messageContext) async {
+          print('[Chatterbox] on video, count: ${messageContext.mediaFiles?.length ?? 0}');
+          _flowManager.handle(messageContext);
+        }));
+
+    _bot.onSticker((ctx) => processSticker(ctx.update, (messageContext) async {
+          print('[Chatterbox] on sticker, count: ${messageContext.mediaFiles?.length ?? 0}');
+          _flowManager.handle(messageContext);
+        }));
+    //
+    // _bot.onAnimation((ctx) => processPhoto(ctx.update, (messageContext) async {
+    //       print('[Chatterbox] on animation, count: ${messageContext.mediaFiles?.length ?? 0}');
+    //       _flowManager.handle(messageContext);
+    //     }));
+    //
+    // _bot.onAudio((ctx) => processPhoto(ctx.update, (messageContext) async {
+    //       print('[Chatterbox] on audio, count: ${messageContext.mediaFiles?.length ?? 0}');
+    //       _flowManager.handle(messageContext);
+    //     }));
   }
 
   void startPolling() {
-    bot.start();
+    _bot.start();
   }
 
   void invokeFromWebhook(Map<String, dynamic> updateJson) {
     print('[Chatterbox] Received update from webhook: $updateJson');
     try {
-      bot.handleUpdate(Update.fromJson(updateJson));
+      _bot.handleUpdate(Update.fromJson(updateJson));
     } catch (error) {
       print('[Chatterbox] invokeFromWebhook failed: ${error.toString()}');
     }
@@ -65,7 +87,7 @@ class Chatterbox {
     List<String> args = parseArgs(message.text);
     int id = message.chat.id;
 
-    flowManager.handle(
+    _flowManager.handle(
       MessageContext(userId: id, chatId: id, username: message.from?.username),
       flow.initialStep.uri.appendArgs(args),
     );

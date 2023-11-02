@@ -1,6 +1,6 @@
-import 'package:chatterbox/src/dialog/flow.dart';
-import 'package:chatterbox/src/model/message_context.dart';
+import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
+import 'package:chatterbox/src/utils/media_file_converters.dart';
 import 'package:televerse/telegram.dart';
 
 typedef UpdateCommandHandler = Future<void> Function(MessageContext messageContext, String command);
@@ -81,19 +81,50 @@ void processPreCheckoutQuery(Update update, UpdateStepHandler commandHandler) {
   }
 }
 
-// void processMediaFile(Message message, MediaFile media, CommandMessageHandler commandHandler) {
-//   final chatId = message.chat.id;
-//   final user = message.from;
-//   final userId = user?.id;
-//
-//   if (userId == null) return;
-//
-//   commandHandler(MessageContext(
-//     userId: userId,
-//     chatId: chatId,
-//     username: user.username,
-//     // mediaFile: media, //todo
-//   ));
-// }
+void processPhoto(Update update, UpdateMessageHandler commandHandler) {
+  _processMediaFile(
+    update,
+    (Message? message) => message?.photo?.toMediaFiles(),
+    commandHandler,
+  );
+}
 
-// ... (other classes and functions)
+void processVideo(Update update, UpdateMessageHandler commandHandler) {
+  _processMediaFile(
+    update,
+    (Message? message) {
+      var mediaFile = message?.video?.toMediaFile();
+      return mediaFile == null ? null : [mediaFile];
+    },
+    commandHandler,
+  );
+}
+
+void processSticker(Update update, UpdateMessageHandler commandHandler) {
+  _processMediaFile(
+    update,
+    (Message? message) {
+      var mediaFile = message?.sticker?.toMediaFile();
+      return mediaFile == null ? null : [mediaFile];
+    },
+    commandHandler,
+  );
+}
+
+void _processMediaFile(
+    Update update, List<MediaFile>? Function(Message?) toMediaFiles, UpdateMessageHandler commandHandler) {
+  final message = update.message;
+  final chatId = message?.chat.id;
+  final user = message?.from;
+  final userId = user?.id;
+
+  final files = toMediaFiles(update.message);
+  if (files == null || userId == null) return;
+
+  commandHandler(MessageContext(
+    userId: userId,
+    chatId: chatId ?? userId,
+    username: user?.username ?? '',
+    mediaFiles: files,
+  ));
+}

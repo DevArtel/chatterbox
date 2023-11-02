@@ -1,3 +1,4 @@
+import 'package:chatterbox/src/model/media_file.dart';
 import 'package:chatterbox/src/model/sticker_model.dart';
 
 class MessageContext {
@@ -6,9 +7,8 @@ class MessageContext {
   final String? text;
   final int? editMessageId;
   final String? username;
-  final StickerModel? sticker;
-
-  // final MediaFile? mediaFile; //todo
+  final StickerModel? sticker; //todo should remove and use mediaFiles instead?
+  final List<MediaFile>? mediaFiles;
 
   MessageContext({
     required this.userId,
@@ -17,6 +17,6 @@ class MessageContext {
     this.editMessageId,
     this.username,
     this.sticker,
-    // this.mediaFile,
+    this.mediaFiles,
   });
 }

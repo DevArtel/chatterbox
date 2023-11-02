@@ -8,7 +8,7 @@ import 'package:collection/collection.dart';
 abstract class FlowManager {
   List<FlowStep> get allStepsByUri;
 
-  Future<bool> handle(MessageContext messageContext, StepUri? stepUri);
+  Future<bool> handle(MessageContext messageContext, [StepUri? stepUri]);
 }
 
 typedef StepFactory = FlowStep Function();
@@ -25,7 +25,7 @@ class FlowManagerImpl implements FlowManager {
       flows.map((flow) => flow.steps).expand((steps) => steps).map((step) => step()).toList();
 
   @override
-  Future<bool> handle(MessageContext messageContext, StepUri? stepUri) async {
+  Future<bool> handle(MessageContext messageContext, [StepUri? stepUri]) async {
     int userId = messageContext.userId;
     int? editMessageId = messageContext.editMessageId;
 
