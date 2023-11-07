@@ -1,7 +1,6 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/model/sticker_model.dart';
 import 'package:collection/collection.dart';
-import 'package:televerse/telegram.dart';
 
 sealed class Reaction {
   final Function(int?)? postCallback;
@@ -45,12 +44,13 @@ class ReactionRedirect extends Reaction {
 }
 
 class ReactionInvoice extends Reaction {
-  final int userId;
-  final SuccessfulPayment paymentInvoiceInfo;
+  /// chatId - Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  final int chatId;
+  final InvoiceInfo invoiceInfo;
 
   ReactionInvoice({
-    required this.userId,
-    required this.paymentInvoiceInfo,
+    required this.chatId,
+    required this.invoiceInfo,
     Function(int?)? postCallback,
   }) : super(postCallback);
 }

@@ -1,14 +1,15 @@
 import 'package:chatterbox/src/dialog/flow.dart';
 import 'package:chatterbox/src/storage/dialog_store.dart';
+import 'package:chatterbox/src/utils/store_proxy_stub.dart';
 
 class BotRunner {
   final String botToken;
-  final ChatterboxStore dialogDao;
   final List<Flow> flows;
+  final PendingMessagesStore store;
 
-  BotRunner({
+  const BotRunner({
     required this.botToken,
-    required this.dialogDao,
     required this.flows,
+    this.store = const InMemoryStore(),
   });
 }

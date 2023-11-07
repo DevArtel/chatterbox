@@ -1,6 +1,7 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
+import 'package:chatterbox/src/utils/store_proxy_stub.dart';
 import 'package:chatterbox/src/utils/update_processing_utils.dart';
 import 'package:collection/collection.dart';
 import 'package:televerse/telegram.dart';
@@ -10,11 +11,12 @@ class Chatterbox {
   final List<Flow> flows;
 
   final Bot _bot;
-  final ChatterboxStore _store;
+  final PendingMessagesStore store;
   late final FlowManager _flowManager;
 
-  Chatterbox(String botToken, this.flows, this._store) : _bot = Bot(botToken) {
-    _flowManager = FlowManagerImpl(BotFacadeImpl(_bot.api), _store, flows);
+  Chatterbox({required String botToken, required this.flows, this.store = const InMemoryStore()})
+      : _bot = Bot(botToken) {
+    _flowManager = FlowManagerImpl(BotFacadeImpl(_bot.api), store, flows);
 
     _bot.onText(
       (ctx) {
@@ -22,7 +24,7 @@ class Chatterbox {
         if (message.isCommand) {
           processCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process command /$command');
-            await _store.clearPending(messageContext.userId);
+            await store.clearPending(messageContext.userId);
             _handleCommand(command, message, messageContext);
           });
         } else {

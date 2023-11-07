@@ -13,7 +13,7 @@ abstract class BotFacade {
 
   Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons);
 
-  Future<int> sendInvoice(fromId, SuccessfulPayment paymentInvoiceInfo);
+  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo);
 }
 
 class BotFacadeImpl extends BotFacade {
@@ -47,8 +47,38 @@ class BotFacadeImpl extends BotFacade {
   }
 
   @override
-  Future<int> sendInvoice(fromId, SuccessfulPayment paymentInvoiceInfo) {
-    throw 'Not implemented';
+  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo) async {
+    final message = await api.sendInvoice(
+      ChatID(chatId),
+      title: invoiceInfo.title,
+      description: invoiceInfo.description,
+      payload: invoiceInfo.payload,
+      providerToken: invoiceInfo.providerToken,
+      currency: invoiceInfo.currency,
+      prices: invoiceInfo.prices,
+      messageThreadId: invoiceInfo.messageThreadId,
+      maxTipAmount: invoiceInfo.maxTipAmount,
+      suggestedTipAmounts: invoiceInfo.suggestedTipAmounts,
+      startParameter: invoiceInfo.startParameter,
+      providerData: invoiceInfo.providerData,
+      photoUrl: invoiceInfo.photoUrl,
+      photoSize: invoiceInfo.photoSize,
+      photoWidth: invoiceInfo.photoWidth,
+      photoHeight: invoiceInfo.photoHeight,
+      needName: invoiceInfo.needName,
+      needPhoneNumber: invoiceInfo.needPhoneNumber,
+      needEmail: invoiceInfo.needEmail,
+      needShippingAddress: invoiceInfo.needShippingAddress,
+      sendPhoneNumberToProvider: invoiceInfo.sendPhoneNumberToProvider,
+      sendEmailToProvider: invoiceInfo.sendEmailToProvider,
+      isFlexible: invoiceInfo.isFlexible,
+      disableNotification: invoiceInfo.disableNotification,
+      protectContent: invoiceInfo.protectContent,
+      replyToMessageId: invoiceInfo.replyToMessageId,
+      allowSendingWithoutReply: invoiceInfo.allowSendingWithoutReply,
+      replyMarkup: invoiceInfo.replyMarkup,
+    );
+    return message.messageId;
   }
 }
 

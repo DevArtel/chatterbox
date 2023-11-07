@@ -57,3 +57,12 @@ ReactionResponse(
 ```
 It can also contain buttons
 
+
+# Setup Google Cloud Run
+1. Install gcloud console utility
+2. gcloud init
+3. Create a project and give it a unique id, alternatively you can create a project at https://console.cloud.google.com/
+4. Go to Google Cloud run and do following
+5. Enable Identity and Access Management (IAM) API https://console.cloud.google.com/apis/library/iam.googleapis.com?project=getrid-0
+6. Trigger a build https://console.cloud.google.com/cloud-build/triggers?project=getrid-0
+7. Add Secrets https://console.cloud.google.com/marketplace/product/google/secretmanager.googleapis.com?returnUrl=%2Fsecurity%2Fsecret-manager%3Fproject%3Dgetrid-0&project=getrid-0

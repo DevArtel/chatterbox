@@ -1,3 +1,8 @@
+## 1.0.6
+- Implement SendInvoice functionality
+- Rename ChatterboxStore to PendingMessagesStore
+- Introduce default InMemoryStore
+
 ## 1.0.5
 - Implement handling Photo, Video and Sticker Media files (pass them via MessageContext#mediaFile)
 

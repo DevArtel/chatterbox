@@ -15,7 +15,7 @@ typedef StepFactory = FlowStep Function();
 
 class FlowManagerImpl implements FlowManager {
   final BotFacade bot;
-  final ChatterboxStore store;
+  final PendingMessagesStore store;
   final List<Flow> flows;
 
   FlowManagerImpl(this.bot, this.store, this.flows);
@@ -77,14 +77,16 @@ class FlowManagerImpl implements FlowManager {
     reaction.postCallback?.call(responseMessageId);
   }
 
+  /// @return sent message id
   Future<int?> _react(Reaction result, MessageContext messageContext) async {
     return switch (result) {
+      (ReactionNone) => null,
       ReactionResponse reactionResponse => () async {
           final uri = result.afterReplyUri;
           if (uri != null) {
             await store.setPending(messageContext.userId, uri);
           }
-          bot.replyWithButtons(
+          return bot.replyWithButtons(
             messageContext.userId,
             reactionResponse.editMessageId,
             reactionResponse.text,
@@ -107,16 +109,13 @@ class FlowManagerImpl implements FlowManager {
           processResult(step!, args, messageContext);
           return sendMessageId;
         }(),
-      // (Invoice reactionInvoice) => () {
-      //     // final reactionInvoice = result as ReactionInvoice;
-      //     final messageResult = bot.sendInvoice(
-      //       reactionInvoice.userId,
-      //       // ChatId.fromId(reactionInvoice.userId),
-      //       reactionInvoice.paymentInvoiceInfo,
-      //     );
-      //     return messageResult.first?.body()?.result?.messageId;
-      //   }(),
-      // (ReactionNone) => null,
+      (ReactionInvoice reactionInvoice) => () {
+          final sendMessageId = bot.sendInvoice(
+            reactionInvoice.chatId,
+            reactionInvoice.invoiceInfo,
+          );
+          return sendMessageId;
+        }(),
       (ReactionForeignResponse reactionForeignResponse) =>
         // final reactionForeignResponse = result as ReactionForeignResponse;
         bot.replyWithButtons(
