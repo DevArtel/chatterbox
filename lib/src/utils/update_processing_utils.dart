@@ -64,17 +64,16 @@ void processPreCheckoutQuery(Update update, UpdateStepHandler commandHandler) {
   final preCheckoutQuery = update.preCheckoutQuery;
   if (preCheckoutQuery != null) {
     final user = preCheckoutQuery.from;
-    print('[ACCOUNT_MANAGER_BOT] received preCheckouQuery from user ${user.id}');
 
     final stepUri = preCheckoutQuery.invoicePayload;
     final userId = user.id;
-    // commandHandler(MessageContext(userId, userId, username: user.username), stepUri);
+
     commandHandler(
       MessageContext(
         userId: userId,
-        chatId: userId,
-        // editMessageId: message.messageId,
+        chatId: userId, //todo check if can be coming from actual chat, not user
         username: user.username,
+        preCheckoutInfo: preCheckoutQuery,
       ),
       stepUri,
     );

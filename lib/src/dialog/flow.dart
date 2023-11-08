@@ -56,13 +56,4 @@ abstract class FlowStep {
     final payload = parts.length > 1 ? parts.sublist(1).join(delimiter).split(argsDelimiter) : null;
     return (parts.first, payload);
   }
-
-  static String _encode(String method, List<dynamic> args) {
-    if (args.isNotEmpty) {
-      final payload = args.map((arg) => arg.toString()).join(argsDelimiter);
-      return "$method$delimiter$payload";
-    } else {
-      return method;
-    }
-  }
 }

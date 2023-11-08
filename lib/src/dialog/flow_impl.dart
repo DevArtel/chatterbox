@@ -78,60 +78,61 @@ class FlowManagerImpl implements FlowManager {
   }
 
   /// @return sent message id
-  Future<int?> _react(Reaction result, MessageContext messageContext) async {
-    return switch (result) {
-      (ReactionNone) => null,
-      ReactionResponse reactionResponse => () async {
-          final uri = result.afterReplyUri;
-          if (uri != null) {
-            await store.setPending(messageContext.userId, uri);
-          }
-          return bot.replyWithButtons(
-            messageContext.userId,
-            reactionResponse.editMessageId,
-            reactionResponse.text,
-            reactionResponse.buttons,
-          );
-        }(),
-      (ReactionRedirect reactionRedirect) => () {
-          final stepData = FlowStep.fromUri(reactionRedirect.stepUri, allStepsByUri);
-          final step = stepData.$1;
-          final args = stepData.$2;
-          var text = reactionRedirect.text;
-          final sendMessageId = text != null
-              ? bot.replyWithButtons(
-                  messageContext.userId,
-                  reactionRedirect.editMessageId,
-                  text,
-                  [],
-                )
-              : null;
-          processResult(step!, args, messageContext);
-          return sendMessageId;
-        }(),
-      (ReactionInvoice reactionInvoice) => () {
-          final sendMessageId = bot.sendInvoice(
-            reactionInvoice.chatId,
-            reactionInvoice.invoiceInfo,
-          );
-          return sendMessageId;
-        }(),
-      (ReactionForeignResponse reactionForeignResponse) =>
-        // final reactionForeignResponse = result as ReactionForeignResponse;
-        bot.replyWithButtons(
-          reactionForeignResponse.foreignUserId,
-          reactionForeignResponse.editMessageId,
-          reactionForeignResponse.text,
-          reactionForeignResponse.buttons,
-        ),
-      (ReactionComposed reactionComposed) => () async {
-          for (var response in reactionComposed.responses) {
-            _react(response, messageContext);
-            await Future.delayed(Duration(milliseconds: 300));
-          }
-          return null;
-        }(),
-      _ => throw Exception("Unknown Reaction type: ${result.runtimeType}"),
-    };
-  }
+  Future<int?> _react(Reaction result, MessageContext messageContext) async => switch (result) {
+        ReactionNone _ => null,
+        ReactionResponse reactionResponse => () async {
+            final uri = result.afterReplyUri;
+            if (uri != null) {
+              await store.setPending(messageContext.userId, uri);
+            }
+            return bot.replyWithButtons(
+              messageContext.userId,
+              reactionResponse.editMessageId,
+              reactionResponse.text,
+              reactionResponse.buttons,
+            );
+          }(),
+        (ReactionRedirect reactionRedirect) => () {
+            final stepData = FlowStep.fromUri(reactionRedirect.stepUri, allStepsByUri);
+            final step = stepData.$1;
+            final args = stepData.$2;
+            var text = reactionRedirect.text;
+            final sendMessageId = text != null
+                ? bot.replyWithButtons(
+                    messageContext.userId,
+                    reactionRedirect.editMessageId,
+                    text,
+                    [],
+                  )
+                : null;
+            processResult(step!, args, messageContext);
+            return sendMessageId;
+          }(),
+        (ReactionInvoice reactionInvoice) => () {
+            final sendMessageId = bot.sendInvoice(
+              reactionInvoice.chatId,
+              reactionInvoice.invoiceInfo,
+              reactionInvoice.preCheckoutUri,
+            );
+            return sendMessageId;
+          }(),
+        (ReactionForeignResponse reactionForeignResponse) =>
+          // final reactionForeignResponse = result as ReactionForeignResponse;
+          bot.replyWithButtons(
+            reactionForeignResponse.foreignUserId,
+            reactionForeignResponse.editMessageId,
+            reactionForeignResponse.text,
+            reactionForeignResponse.buttons,
+          ),
+        (ReactionComposed reactionComposed) => () async {
+            for (var response in reactionComposed.responses) {
+              _react(response, messageContext);
+              await Future.delayed(Duration(milliseconds: 300));
+            }
+            return null;
+          }(),
+        // ignoring in case a new Reaction type is added
+        // ignore: unreachable_switch_case
+        _ => throw Exception("Unknown Reaction type: ${result.runtimeType}"),
+      };
 }

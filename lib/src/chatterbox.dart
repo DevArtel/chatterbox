@@ -1,7 +1,6 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
-import 'package:chatterbox/src/utils/store_proxy_stub.dart';
 import 'package:chatterbox/src/utils/update_processing_utils.dart';
 import 'package:collection/collection.dart';
 import 'package:televerse/telegram.dart';
@@ -14,8 +13,7 @@ class Chatterbox {
   final PendingMessagesStore store;
   late final FlowManager _flowManager;
 
-  Chatterbox({required String botToken, required this.flows, this.store = const InMemoryStore()})
-      : _bot = Bot(botToken) {
+  Chatterbox({required String botToken, required this.flows, required this.store}) : _bot = Bot(botToken) {
     _flowManager = FlowManagerImpl(BotFacadeImpl(_bot.api), store, flows);
 
     _bot.onText(
@@ -38,10 +36,12 @@ class Chatterbox {
 
     _bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update, (messageContext, stepUri) async {
           print('[Chatterbox] Process callback query $stepUri');
-          _flowManager.handle(
-            messageContext,
-            stepUri,
-          );
+          _flowManager.handle(messageContext, stepUri);
+        }));
+
+    _bot.onPreCheckoutQuery((ctx) => processPreCheckoutQuery(ctx.update, (messageContext, stepUri) async {
+          print('[Chatterbox] Process pre checkout query $stepUri');
+          _flowManager.handle(messageContext, stepUri);
         }));
 
     _bot.onPhoto((ctx) => processPhoto(ctx.update, (messageContext) async {

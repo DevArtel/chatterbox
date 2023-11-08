@@ -10,3 +10,4 @@ export 'src/model/media_file.dart';
 export 'src/model/message_context.dart';
 export 'src/storage/dialog_store.dart';
 export 'src/utils/hash_utils.dart';
+export 'src/utils/in_memory_store.dart';

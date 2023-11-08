@@ -1,11 +1,11 @@
 import 'package:televerse/telegram.dart';
 
 /// Documentation for fields of the class can be found [here](https://core.telegram.org/bots/api#sendinvoice)
+/// Except for payload filed which is used to store next step uri and passed through [ReactionInvoice.preCheckoutStepUri]
 class InvoiceInfo {
   InvoiceInfo({
     required this.title,
     required this.description,
-    required this.payload,
     required this.providerToken,
     required this.currency,
     required this.prices,
@@ -34,7 +34,6 @@ class InvoiceInfo {
 
   String title;
   String description;
-  String payload;
   String providerToken;
   String currency;
   List<LabeledPrice> prices;

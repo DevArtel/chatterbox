@@ -1,5 +1,6 @@
 import 'package:chatterbox/src/model/media_file.dart';
 import 'package:chatterbox/src/model/sticker_model.dart';
+import 'package:televerse/telegram.dart';
 
 class MessageContext {
   final int userId;
@@ -9,6 +10,7 @@ class MessageContext {
   final String? username;
   final StickerModel? sticker; //todo should remove and use mediaFiles instead?
   final List<MediaFile>? mediaFiles;
+  final PreCheckoutQuery? preCheckoutInfo; //todo should not use model from televerse?
 
   MessageContext({
     required this.userId,
@@ -18,5 +20,6 @@ class MessageContext {
     this.username,
     this.sticker,
     this.mediaFiles,
+    this.preCheckoutInfo,
   });
 }

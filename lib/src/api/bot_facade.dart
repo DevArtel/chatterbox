@@ -13,7 +13,7 @@ abstract class BotFacade {
 
   Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons);
 
-  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo);
+    Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri);
 }
 
 class BotFacadeImpl extends BotFacade {
@@ -47,12 +47,12 @@ class BotFacadeImpl extends BotFacade {
   }
 
   @override
-  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo) async {
+  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri) async {
     final message = await api.sendInvoice(
       ChatID(chatId),
       title: invoiceInfo.title,
       description: invoiceInfo.description,
-      payload: invoiceInfo.payload,
+      payload: preCheckoutUri,
       providerToken: invoiceInfo.providerToken,
       currency: invoiceInfo.currency,
       prices: invoiceInfo.prices,
