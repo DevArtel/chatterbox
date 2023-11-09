@@ -11,6 +11,7 @@ class MessageContext {
   final StickerModel? sticker; //todo should remove and use mediaFiles instead?
   final List<MediaFile>? mediaFiles;
   final PreCheckoutQuery? preCheckoutInfo; //todo should not use model from televerse?
+  final SuccessfulPayment? successfulPayment;
 
   MessageContext({
     required this.userId,
@@ -21,5 +22,6 @@ class MessageContext {
     this.sticker,
     this.mediaFiles,
     this.preCheckoutInfo,
+    this.successfulPayment,
   });
 }

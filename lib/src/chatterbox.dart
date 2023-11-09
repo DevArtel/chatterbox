@@ -77,7 +77,18 @@ class Chatterbox {
   void invokeFromWebhook(Map<String, dynamic> updateJson) {
     print('[Chatterbox] Received update from webhook: $updateJson');
     try {
-      _bot.handleUpdate(Update.fromJson(updateJson));
+      var update = Update.fromJson(updateJson);
+      print('[Chatterbox] update model: $update');
+      var successfulPayment = update.message?.successfulPayment;
+      if (successfulPayment != null) {
+        processSuccessfulPayment(
+          update,
+          successfulPayment,
+          (messageContext) => _flowManager.handle(messageContext),
+        );
+      } else {
+        _bot.handleUpdate(update);
+      }
     } catch (error) {
       print('[Chatterbox] invokeFromWebhook failed: ${error.toString()}');
     }

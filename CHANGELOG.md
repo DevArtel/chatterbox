@@ -4,6 +4,7 @@
 - Introduce default InMemoryStore
 - Add preCheckoutInfo to MessageContext 
 - Implement processPreCheckoutQuery update
+- Introduce process SuccessfulPayment update
 
 ## 1.0.5
 - Implement handling Photo, Video and Sticker Media files (pass them via MessageContext#mediaFile)

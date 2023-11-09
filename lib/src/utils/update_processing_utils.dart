@@ -80,6 +80,24 @@ void processPreCheckoutQuery(Update update, UpdateStepHandler commandHandler) {
   }
 }
 
+void processSuccessfulPayment(Update update, SuccessfulPayment successfulPayment, UpdateMessageHandler commandHandler) {
+  var message = update.message;
+  final user = message?.from;
+  final userId = user?.id;
+
+  if (userId == null) return;
+  final chatId = message?.chat.id ?? userId;
+
+  commandHandler(
+    MessageContext(
+      userId: userId,
+      chatId: chatId,
+      username: user?.username,
+      successfulPayment: successfulPayment,
+    ),
+  );
+}
+
 void processPhoto(Update update, UpdateMessageHandler commandHandler) {
   _processMediaFile(
     update,
@@ -111,7 +129,10 @@ void processSticker(Update update, UpdateMessageHandler commandHandler) {
 }
 
 void _processMediaFile(
-    Update update, List<MediaFile>? Function(Message?) toMediaFiles, UpdateMessageHandler commandHandler) {
+  Update update,
+  List<MediaFile>? Function(Message?) toMediaFiles,
+  UpdateMessageHandler commandHandler,
+) {
   final message = update.message;
   final chatId = message?.chat.id;
   final user = message?.from;

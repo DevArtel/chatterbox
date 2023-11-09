@@ -13,7 +13,7 @@ abstract class BotFacade {
 
   Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons);
 
-    Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri);
+  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri, int? editMessageId);
 }
 
 class BotFacadeImpl extends BotFacade {
@@ -47,7 +47,7 @@ class BotFacadeImpl extends BotFacade {
   }
 
   @override
-  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri) async {
+  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri, int? editMessageId) async {
     final message = await api.sendInvoice(
       ChatID(chatId),
       title: invoiceInfo.title,
@@ -78,6 +78,10 @@ class BotFacadeImpl extends BotFacade {
       allowSendingWithoutReply: invoiceInfo.allowSendingWithoutReply,
       replyMarkup: invoiceInfo.replyMarkup,
     );
+
+    if (editMessageId != null) { //todo telegram message window is blinking when deleting instead of editing
+      await api.deleteMessage(ChatID(chatId), editMessageId);
+    }
     return message.messageId;
   }
 }

@@ -48,11 +48,13 @@ class ReactionInvoice extends Reaction {
   final int chatId;
   final InvoiceInfo invoiceInfo;
   final String preCheckoutUri;
+  final int? editMessageId;
 
   ReactionInvoice({
     required this.chatId,
     required this.invoiceInfo,
     required this.preCheckoutUri,
+    this.editMessageId,
     Function(int?)? postCallback,
   }) : super(postCallback);
 }

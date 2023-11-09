@@ -113,6 +113,7 @@ class FlowManagerImpl implements FlowManager {
               reactionInvoice.chatId,
               reactionInvoice.invoiceInfo,
               reactionInvoice.preCheckoutUri,
+              reactionInvoice.editMessageId,
             );
             return sendMessageId;
           }(),
