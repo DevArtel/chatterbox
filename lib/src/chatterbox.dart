@@ -1,6 +1,7 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
+import 'package:chatterbox/src/utils/televerse_extensions.dart';
 import 'package:chatterbox/src/utils/update_processing_utils.dart';
 import 'package:collection/collection.dart';
 import 'package:televerse/telegram.dart';
@@ -44,6 +45,11 @@ class Chatterbox {
           _flowManager.handle(messageContext, stepUri);
         }));
 
+    _bot.onSuccessfulPayment((ctx) => processSuccessfulPayment(ctx.update, (messageContext) async {
+          print('[Chatterbox] Process successful payment ${messageContext.successfulPayment}');
+          _flowManager.handle(messageContext);
+        }));
+
     _bot.onPhoto((ctx) => processPhoto(ctx.update, (messageContext) async {
           print('[Chatterbox] on photo, count: ${messageContext.mediaFiles?.length ?? 0}');
           _flowManager.handle(messageContext);
@@ -77,18 +83,8 @@ class Chatterbox {
   void invokeFromWebhook(Map<String, dynamic> updateJson) {
     print('[Chatterbox] Received update from webhook: $updateJson');
     try {
-      var update = Update.fromJson(updateJson);
-      print('[Chatterbox] update model: $update');
-      var successfulPayment = update.message?.successfulPayment;
-      if (successfulPayment != null) {
-        processSuccessfulPayment(
-          update,
-          successfulPayment,
-          (messageContext) => _flowManager.handle(messageContext),
-        );
-      } else {
-        _bot.handleUpdate(update);
-      }
+      final update = Update.fromJson(updateJson);
+      _bot.handleUpdate(update);
     } catch (error) {
       print('[Chatterbox] invokeFromWebhook failed: ${error.toString()}');
     }

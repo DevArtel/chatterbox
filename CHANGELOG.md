@@ -1,8 +1,9 @@
-## 1.0.6
+## 1.0.6 Payments
+- Implement processing payments functions
 - Implement SendInvoice functionality
 - Rename ChatterboxStore to PendingMessagesStore
 - Introduce default InMemoryStore
-- Add preCheckoutInfo to MessageContext 
+- Add preCheckoutInfo to MessageContext
 - Implement processPreCheckoutQuery update
 - Introduce process SuccessfulPayment update
 

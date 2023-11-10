@@ -80,12 +80,14 @@ void processPreCheckoutQuery(Update update, UpdateStepHandler commandHandler) {
   }
 }
 
-void processSuccessfulPayment(Update update, SuccessfulPayment successfulPayment, UpdateMessageHandler commandHandler) {
-  var message = update.message;
+void processSuccessfulPayment(Update update, UpdateMessageHandler commandHandler) {
+  final message = update.message;
   final user = message?.from;
   final userId = user?.id;
 
-  if (userId == null) return;
+  final successfulPayment = update.message?.successfulPayment;
+
+  if (successfulPayment == null || userId == null) return;
   final chatId = message?.chat.id ?? userId;
 
   commandHandler(
