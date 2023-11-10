@@ -1,6 +1,6 @@
 name: chatterbox
 description: Framework to build dialog flows for Telegram Bots
-version: 1.0.5
+version: 1.0.6
 repository: https://dart.dev/tools/pub/publishing
 
 environment:
