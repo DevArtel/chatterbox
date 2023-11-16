@@ -80,7 +80,7 @@ class FlowManagerImpl implements FlowManager {
   /// @return sent message id
   Future<int?> _react(Reaction result, MessageContext messageContext) async => switch (result) {
         ReactionNone _ => null,
-        ReactionResponse reactionResponse => () async {
+        final ReactionResponse reactionResponse => () async {
             final uri = result.afterReplyUri;
             if (uri != null) {
               await store.setPending(messageContext.userId, uri);
@@ -92,11 +92,11 @@ class FlowManagerImpl implements FlowManager {
               reactionResponse.buttons,
             );
           }(),
-        (ReactionRedirect reactionRedirect) => () {
+        (final ReactionRedirect reactionRedirect) => () {
             final stepData = FlowStep.fromUri(reactionRedirect.stepUri, allStepsByUri);
             final step = stepData.$1;
             final args = stepData.$2;
-            var text = reactionRedirect.text;
+            final text = reactionRedirect.text;
             final sendMessageId = text != null
                 ? bot.replyWithButtons(
                     messageContext.userId,
@@ -108,7 +108,7 @@ class FlowManagerImpl implements FlowManager {
             processResult(step!, args, messageContext);
             return sendMessageId;
           }(),
-        (ReactionInvoice reactionInvoice) => () {
+        (final ReactionInvoice reactionInvoice) => () {
             final sendMessageId = bot.sendInvoice(
               reactionInvoice.chatId,
               reactionInvoice.invoiceInfo,
@@ -117,7 +117,7 @@ class FlowManagerImpl implements FlowManager {
             );
             return sendMessageId;
           }(),
-        (ReactionForeignResponse reactionForeignResponse) =>
+        (final ReactionForeignResponse reactionForeignResponse) =>
           // final reactionForeignResponse = result as ReactionForeignResponse;
           bot.replyWithButtons(
             reactionForeignResponse.foreignUserId,
@@ -125,7 +125,7 @@ class FlowManagerImpl implements FlowManager {
             reactionForeignResponse.text,
             reactionForeignResponse.buttons,
           ),
-        (ReactionComposed reactionComposed) => () async {
+        (final ReactionComposed reactionComposed) => () async {
             for (var response in reactionComposed.responses) {
               _react(response, messageContext);
               await Future.delayed(Duration(milliseconds: 300));

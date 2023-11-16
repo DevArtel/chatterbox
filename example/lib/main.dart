@@ -32,7 +32,7 @@ Future<Response> _handleRequest(Request request) async {
     StartFlow(),
     MenuFlow(),
     CountdownGameFlow(),
-    SticksGameFlow(),
+    TwentyOneSticksGameFlow(),
   ];
 
   final requestBody = await request.readAsString();
