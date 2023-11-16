@@ -32,7 +32,7 @@ class _PlayerTurnStep extends FlowStep {
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     final number = (args?.firstOrNull ?? '21');
 
-    if (number == "1") {
+    if (number == "1") { //todo pass params for propper winning calculation. params should be [originalNumber, botChoice]
       return ReactionRedirect(stepUri: (_OnBotWonStep).toStepUri());
     } else if (number == "0") {
       return ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri());
@@ -58,16 +58,16 @@ class _BotTurnStep extends FlowStep {
     final number = int.parse(originalNumber) - int.parse(userChoice);
 
     if (number == 1) {
-      return ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri());
+      return ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri([originalNumber, userChoice]));
     } else if (number == 0) {
-      return ReactionRedirect(stepUri: (_OnBotWonStep).toStepUri());
+      return ReactionRedirect(stepUri: (_OnBotWonStep).toStepUri([originalNumber, userChoice]));
     }
 
     final botTurn = Random().nextInt(min(3, number)) + 1;
 
     return ReactionComposed(responses: [
       ReactionResponse(
-        text: 'There are $originalNumber sticks.\n\nYou took out #$userChoice sticks.',
+        text: 'There are $originalNumber sticks.\n\nYou took out $userChoice sticks.',
         editMessageId: messageContext.editMessageId,
       ),
       ReactionResponse(
@@ -83,17 +83,35 @@ class _BotTurnStep extends FlowStep {
 class _OnBotWonStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    return ReactionResponse(
-      text: 'Bot won!',
-    );
+    final originalNumber = (args?.firstOrNull ?? 'error');
+    final userChoice = (args?.elementAtOrNull(1) ?? 'error');
+
+    return ReactionComposed(responses: [
+      ReactionResponse(
+        text: 'There are $originalNumber sticks.\n\nYou took out $userChoice sticks.',
+        editMessageId: messageContext.editMessageId,
+      ),
+      ReactionResponse(
+        text: 'Bot won!',
+      ),
+    ]);
   }
 }
 
 class _OnPlayerWonStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    return ReactionResponse(
-      text: 'You won!',
-    );
+    final originalNumber = (args?.firstOrNull ?? 'error');
+    final userChoice = (args?.elementAtOrNull(1) ?? 'error');
+
+    return ReactionComposed(responses: [
+      ReactionResponse(
+        text: 'There are $originalNumber sticks.\n\nYou took out $userChoice sticks.',
+        editMessageId: messageContext.editMessageId,
+      ),
+      ReactionResponse(
+        text: 'You won!',
+      ),
+    ]);
   }
 }
