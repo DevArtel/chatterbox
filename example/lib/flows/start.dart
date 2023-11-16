@@ -1,4 +1,5 @@
 import 'package:chatterbox/chatterbox.dart';
+import 'package:example/flows/menu.dart';
 
 class StartFlow extends CommandFlow {
   @override
@@ -6,13 +7,20 @@ class StartFlow extends CommandFlow {
 
   @override
   List<StepFactory> get steps => [
-        () => _InitialFlow(),
+        () => _InitialStep(),
       ];
 }
 
-class _InitialFlow extends FlowStep {
+class _InitialStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    return ReactionResponse(text: "Heheheh! Woody here! 🐦 Ready to chat and chuckle! What's up?");
+    return ReactionComposed(
+      responses: [
+        ReactionResponse(
+          text: "Heheheh! Woody here! 🐦 Ready to chat and chuckle! What's up?",
+        ),
+        ReactionRedirect(stepUri: (MenuInitialStep).toStepUri())
+      ],
+    );
   }
 }

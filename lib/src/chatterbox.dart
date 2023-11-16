@@ -93,8 +93,8 @@ class Chatterbox {
   void startFlowForMessage(Flow flow, Message message) {
     print('[Chatterbox] startFlowForMessage: ${message.text}');
     // TODO: Encode these args, because if stepUri is an argument it's not parsed properly
-    List<String> args = parseArgs(message.text);
-    int id = message.chat.id;
+    final args = parseArgs(message.text);
+    final id = message.chat.id;
 
     _flowManager.handle(
       MessageContext(userId: id, chatId: id, username: message.from?.username),
