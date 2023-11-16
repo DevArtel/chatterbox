@@ -2,11 +2,10 @@ import 'dart:math';
 
 import 'package:chatterbox/chatterbox.dart';
 
-/// In the game of 21 Sticks, two players take turns removing 1 to 3 sticks from a total of 21. The player forced to take the last stick loses.
-class TwentyOneSticksGameFlow extends Flow {
+class TwentyOneSticksBotGameFlow extends Flow {
   @override
   List<StepFactory> get steps => [
-        () => TwentyOneSticksGameFlowInitialStep(),
+        () => TwentyOneSticksBotGameFlowInitialStep(),
         () => _PlayerTurnStep(),
         () => _BotTurnStep(),
         () => _OnBotWonStep(),
@@ -14,7 +13,7 @@ class TwentyOneSticksGameFlow extends Flow {
       ];
 }
 
-class TwentyOneSticksGameFlowInitialStep extends FlowStep {
+class TwentyOneSticksBotGameFlowInitialStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionComposed(responses: [
@@ -32,7 +31,8 @@ class _PlayerTurnStep extends FlowStep {
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     final number = (args?.firstOrNull ?? '21');
 
-    if (number == "1") { //todo pass params for propper winning calculation. params should be [originalNumber, botChoice]
+    if (number == "1") {
+      //todo pass params for propper winning calculation. params should be [originalNumber, botChoice]
       return ReactionRedirect(stepUri: (_OnBotWonStep).toStepUri());
     } else if (number == "0") {
       return ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri());

@@ -1,6 +1,6 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:example/flows/coundown_game.dart';
-import 'package:example/flows/sticks_game.dart';
+import 'package:example/flows/twentyone_sticks_game/twentyone_sticks_game.dart';
 
 class MenuFlow extends CommandFlow {
   @override

@@ -26,18 +26,18 @@ class FlowManagerImpl implements FlowManager {
 
   @override
   Future<bool> handle(MessageContext messageContext, [StepUri? stepUri]) async {
-    int userId = messageContext.userId;
-    int? editMessageId = messageContext.editMessageId;
+    final userId = messageContext.userId;
+    final editMessageId = messageContext.editMessageId;
 
     print("Handle invoked $userId $editMessageId ${messageContext.text}");
 
-    String? pendingStepUrl = await store.retrievePending(userId);
-    var pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri);
-    var pendingStep = pendingData.$1;
-    var pendingArgs = pendingData.$2;
+    final String? pendingStepUrl = await store.retrievePending(userId);
+    final pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri);
+    final pendingStep = pendingData.$1;
+    final pendingArgs = pendingData.$2;
 
     if (pendingStep == null && stepUri == null) {
-      Flow? handlingFlow = flows.firstWhereOrNull((flow) => flow.willHandle(messageContext));
+      final Flow? handlingFlow = flows.firstWhereOrNull((flow) => flow.willHandle(messageContext));
       if (handlingFlow != null) {
         processResult(handlingFlow.initialStep, null, messageContext);
         print("[FlowManager] Handle by ${handlingFlow.runtimeType}");
@@ -86,7 +86,7 @@ class FlowManagerImpl implements FlowManager {
               await store.setPending(messageContext.userId, uri);
             }
             return bot.replyWithButtons(
-              messageContext.userId,
+              messageContext.chatId,
               reactionResponse.editMessageId,
               reactionResponse.text,
               reactionResponse.buttons,
