@@ -6,7 +6,7 @@ import 'package:chatterbox/chatterbox.dart';
 class TwentyOneSticksPvpGameFlow extends Flow {
   @override
   List<StepFactory> get steps => [
-        () => TwentyOneSticksGameFlowInitialStep(),
+        () => TwentyOneSticksGamePvpFlowInitialStep(),
         () => _PlayerTurnStep(),
         () => _BotTurnStep(),
         () => _OnBotWonStep(),
@@ -14,7 +14,7 @@ class TwentyOneSticksPvpGameFlow extends Flow {
       ];
 }
 
-class TwentyOneSticksGameFlowInitialStep extends FlowStep {
+class TwentyOneSticksGamePvpFlowInitialStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionComposed(responses: [

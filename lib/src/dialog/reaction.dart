@@ -21,11 +21,15 @@ class ReactionResponse extends Reaction {
   /// This step will be invoked after user reply with user message passed as param
   final String? afterReplyUri;
 
+  /// Determins when to trigger afterReplyUri. If null, then it will be triggered after any user reply
+  AfterReplyUriFilter? afterReplyUriTrigger;
+
   ReactionResponse({
     required this.text,
     this.editMessageId,
     this.buttons = const [],
     this.afterReplyUri,
+    this.afterReplyUriTrigger,
     Function(int?)? postCallback,
   }) : super(postCallback);
 }
@@ -95,4 +99,11 @@ class ReactionComposed extends Reaction {
 
 FlowStep? findById(List<FlowStep> steps, String stepId) {
   return steps.firstWhereOrNull((step) => step.uri == stepId);
+}
+
+class AfterReplyUriFilter {
+  AfterReplyUriFilter(this.userId, this.messageText);
+
+  final int? userId;
+  final String? messageText;
 }
