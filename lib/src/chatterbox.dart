@@ -96,8 +96,9 @@ class Chatterbox {
     final args = parseArgs(message.text);
     final id = message.chat.id;
 
+    final user = message.from;
     _flowManager.handle(
-      MessageContext(userId: id, chatId: id, username: message.from?.username),
+      MessageContext(userId: id, chatId: id, username: user?.username, locale: user?.languageCode),
       flow.initialStep.uri.appendArgs(args),
     );
   }

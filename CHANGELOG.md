@@ -1,3 +1,6 @@
+## 1.0.7 Locale
+- Add user locale to MessageContext
+
 ## 1.0.6 Payments
 - Implement processing payments functions
 - Implement SendInvoice functionality
