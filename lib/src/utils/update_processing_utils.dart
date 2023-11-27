@@ -32,6 +32,7 @@ void processTextInternal(Message message, UpdateMessageHandler commandHandler) {
   commandHandler(MessageContext(
     userId: userId,
     chatId: chatId,
+    original: message,
     locale: user?.languageCode,
     editMessageId: message.messageId,
     username: user?.username,
@@ -54,6 +55,7 @@ void processCallbackQuery(Update update, UpdateStepHandler commandHandler) {
       MessageContext(
         userId: userId,
         chatId: chatId,
+        original: message,
         locale: user?.languageCode,
         editMessageId: message.messageId,
         username: user?.username,
@@ -75,6 +77,7 @@ void processPreCheckoutQuery(Update update, UpdateStepHandler commandHandler) {
       MessageContext(
         userId: userId,
         chatId: userId, //todo check if can be coming from actual chat, not user
+        original: null,
         locale: user.languageCode,
         username: user.username,
         preCheckoutInfo: preCheckoutQuery,
@@ -98,6 +101,7 @@ void processSuccessfulPayment(Update update, UpdateMessageHandler commandHandler
     MessageContext(
       userId: userId,
       chatId: chatId,
+      original: message,
       locale: user?.languageCode,
       username: user?.username,
       successfulPayment: successfulPayment,
@@ -151,6 +155,7 @@ void _processMediaFile(
   commandHandler(MessageContext(
     userId: userId,
     chatId: chatId ?? userId,
+    original: message,
     locale: user?.languageCode,
     username: user?.username ?? '',
     mediaFiles: files,

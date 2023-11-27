@@ -53,9 +53,9 @@ class FlowManagerImpl implements FlowManager {
       processResult(pendingStep, pendingArgs, messageContext);
       return true;
     } else if (stepUri != null) {
-      var stepData = FlowStep.fromUri(stepUri, allStepsByUri); // Assuming FlowStep.fromUri is defined
-      var theStep = stepData.$1;
-      var args = stepData.$2;
+      final stepData = FlowStep.fromUri(stepUri, allStepsByUri); // Assuming FlowStep.fromUri is defined
+      final theStep = stepData.$1;
+      final args = stepData.$2;
 
       if (theStep == null) {
         print("[FlowManager] illegal state: COULD NOT FIND STEP FOR URI $stepUri");
@@ -73,7 +73,7 @@ class FlowManagerImpl implements FlowManager {
 
   Future<void> processResult(FlowStep flowStep, List<String>? args, MessageContext messageContext) async {
     final reaction = await flowStep.handle(messageContext, args);
-    int? responseMessageId = await _react(reaction, messageContext);
+    final int? responseMessageId = await _react(reaction, messageContext);
     reaction.postCallback?.call(responseMessageId);
   }
 

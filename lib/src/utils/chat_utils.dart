@@ -4,8 +4,8 @@ import 'package:televerse/telegram.dart';
 
 String? parseCommand(Message? message) {
   final entity = message?.entities?.first;
-  var offset = (entity?.offset ?? 0) + 1;
-  var length = entity?.length ?? 0;
+  final offset = (entity?.offset ?? 0) + 1;
+  final length = entity?.length ?? 0;
   return message?.text?.substring(offset, offset + length - 1);
 }
 

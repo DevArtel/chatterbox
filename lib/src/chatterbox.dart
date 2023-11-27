@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
@@ -90,15 +92,24 @@ class Chatterbox {
     }
   }
 
-  void startFlowForMessage(Flow flow, Message message) {
+  void _startCommandFlowForMessage(Flow flow, Message message) {
     print('[Chatterbox] startFlowForMessage: ${message.text}');
     // TODO: Encode these args, because if stepUri is an argument it's not parsed properly
     final args = parseArgs(message.text);
-    final id = message.chat.id;
+    final chatId = message.chat.id;
 
     final user = message.from;
+    final trimmedText = _trimCommand(message.text);
+
     _flowManager.handle(
-      MessageContext(userId: id, chatId: id, username: user?.username, locale: user?.languageCode),
+      MessageContext(
+        userId: user?.id ?? chatId,
+        chatId: chatId,
+        original: message,
+        username: user?.username,
+        locale: user?.languageCode,
+        text: trimmedText,
+      ),
       flow.initialStep.uri.appendArgs(args),
     );
   }
@@ -106,9 +117,19 @@ class Chatterbox {
   void _handleCommand(String command, Message message, MessageContext messageContext) {
     final flow = flows.whereType<CommandFlow>().firstWhereOrNull((flow) => flow.command == command);
     if (flow != null) {
-      startFlowForMessage(flow, message);
+      _startCommandFlowForMessage(flow, message);
     } else {
       print('[Chatterbox] Flow for $command not found!'); //todo Log.e
     }
+  }
+}
+
+///removes command that starts with / and returnds the rest of the text
+String? _trimCommand(String? text) {
+  final index = text?.indexOf(' ') ?? -1;
+  if (index == -1 || text == null) {
+    return null;
+  } else {
+    return text.substring(min(text.length, index + 1));
   }
 }

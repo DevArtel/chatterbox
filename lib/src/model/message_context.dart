@@ -17,9 +17,12 @@ class MessageContext {
   final PreCheckoutQuery? preCheckoutInfo; //todo should not use model from televerse?
   final SuccessfulPayment? successfulPayment;
 
+  final Message? original;
+
   MessageContext({
     required this.userId,
     required this.chatId,
+    required this.original,
     this.username,
     this.locale,
     this.text,
