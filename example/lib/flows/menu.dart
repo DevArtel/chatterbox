@@ -22,7 +22,7 @@ class MenuInitialStep extends FlowStep {
       ),
       InlineButton(
         title: 'Play 21 sticks',
-        nextStepUri: (TwentyOneSticksGameFlowInitialStep).toStepUri(),
+        nextStepUri: (GameFlowInitialStep).toStepUri(),
       ),
     ]);
   }
