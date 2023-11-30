@@ -12,19 +12,21 @@ extension _PlayerExtension on _Player {
 }
 
 /// In the game of 21 Sticks, two players take turns removing 1 to 3 sticks from a total of 21. The player forced to take the last stick loses.
-class TwentyOneSticksGameFlow extends Flow {
+class TwentyOneSticksGameFlow extends CommandFlow {
+  @override
+  String get command => 'new_game';
+
   @override
   List<StepFactory> get steps => [
-        () => GameFlowInitialStep(),
-        () => _UserInputStep(),
+        () => GameInitialStep(),
+        () => _UserTurnStep(),
         () => _BotTurnStep(),
-        () => _OnPlayerWonStep(),
         () => _GameProcessingStep(),
         () => _OnPlayerWonStep(),
       ];
 }
 
-class GameFlowInitialStep extends FlowStep {
+class GameInitialStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionComposed(responses: [
@@ -32,12 +34,12 @@ class GameFlowInitialStep extends FlowStep {
         text:
             "In the game of 21 Sticks, two players take turns removing 1 to 3 sticks from a total of 21. The player forced to take the last stick loses.",
       ),
-      ReactionRedirect(stepUri: (_UserInputStep).toStepUri())
+      ReactionRedirect(stepUri: (_UserTurnStep).toStepUri())
     ]);
   }
 }
 
-class _UserInputStep extends FlowStep {
+class _UserTurnStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     final number = (args?.firstOrNull ?? '21');
@@ -62,19 +64,24 @@ class _GameProcessingStep extends FlowStep {
 
     final sticksLeft = originalNumber - playerChoice;
 
-    if (sticksLeft == 1) {
-      // actor won
-      return ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri([actor.name]));
-    } else if (sticksLeft == 0) {
-      // opponent won
-      return ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri([actor.getOpponent.name]));
-    } else {
-      // continue by invoking opponent turn
-      return switch (actor) {
-        _Player.user => ReactionRedirect(stepUri: (_BotTurnStep).toStepUri(['$sticksLeft'])),
-        _Player.bot => ReactionRedirect(stepUri: (_UserInputStep).toStepUri(['$sticksLeft'])),
-      };
-    }
+    final reaction = switch (sticksLeft) {
+      1 => ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri([actor.name])),
+      0 => ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri([actor.getOpponent.name])),
+      _ => switch (actor) {
+          _Player.user => ReactionRedirect(stepUri: (_BotTurnStep).toStepUri(['$sticksLeft'])),
+          _Player.bot => ReactionRedirect(stepUri: (_UserTurnStep).toStepUri(['$sticksLeft'])),
+        },
+    };
+
+    return ReactionComposed(responses: [
+      // Remove buttons and update message with info on how many sticks user drew
+      if (actor == _Player.user)
+        ReactionResponse(
+          text: 'There are $originalNumber sticks.\n\nYou took out $playerChoice sticks.',
+          editMessageId: messageContext.editMessageId,
+        ),
+      reaction,
+    ]);
   }
 }
 
@@ -84,6 +91,8 @@ class _BotTurnStep extends FlowStep {
     final sticksLeft = int.parse(args!.first);
 
     final botTurn = Random().nextInt(min(3, sticksLeft)) + 1;
+
+    await Future.delayed(Duration(milliseconds: 300));
 
     return ReactionComposed(responses: [
       ReactionResponse(
@@ -101,9 +110,14 @@ class _OnPlayerWonStep extends FlowStep {
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     final actor = _Player.values.byName(args!.first);
 
+    final text = switch (actor) {
+      _Player.user => 'Congratulations, you won! 🎉✨',
+      _Player.bot => 'Oh, no, you are a looser! 💩😱',
+    };
+
     return ReactionComposed(responses: [
       ReactionResponse(
-        text: '${actor.name} won!',
+        text: text,
       ),
     ]);
   }
