@@ -22,6 +22,7 @@ class TwentyOneSticksGameFlow extends CommandFlow {
         () => _UserTurnStep(),
         () => _BotTurnStep(),
         () => _GameProcessingStep(),
+        () => _GameLooperStep(),
         () => _OnPlayerWonStep(),
       ];
 }
@@ -67,10 +68,7 @@ class _GameProcessingStep extends FlowStep {
     final reaction = switch (sticksLeft) {
       1 => ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri([actor.name])),
       0 => ReactionRedirect(stepUri: (_OnPlayerWonStep).toStepUri([actor.getOpponent.name])),
-      _ => switch (actor) {
-          _Player.user => ReactionRedirect(stepUri: (_BotTurnStep).toStepUri(['$sticksLeft'])),
-          _Player.bot => ReactionRedirect(stepUri: (_UserTurnStep).toStepUri(['$sticksLeft'])),
-        },
+      _ => ReactionRedirect(stepUri: (_GameLooperStep).toStepUri([actor.name, '$sticksLeft'])),
     };
 
     return ReactionComposed(responses: [
@@ -82,6 +80,19 @@ class _GameProcessingStep extends FlowStep {
         ),
       reaction,
     ]);
+  }
+}
+
+class _GameLooperStep extends FlowStep {
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    final actor = _Player.values.byName(args!.first);
+    final sticksLeft = int.parse(args.elementAtOrNull(1)!);
+
+    return switch (actor) {
+      _Player.user => ReactionRedirect(stepUri: (_BotTurnStep).toStepUri(['$sticksLeft'])),
+      _Player.bot => ReactionRedirect(stepUri: (_UserTurnStep).toStepUri(['$sticksLeft'])),
+    };
   }
 }
 
