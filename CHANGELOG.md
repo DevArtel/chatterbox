@@ -1,3 +1,10 @@
+## 1.0.8 Locale
+- Add original message to MessageContext
+- When receiving a command pass text via MessageContext.text field
+
+## 1.0.7 Locale
+- Add user locale to MessageContext
+
 ## 1.0.6 Payments
 - Implement processing payments functions
 - Implement SendInvoice functionality

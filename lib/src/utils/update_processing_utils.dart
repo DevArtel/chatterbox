@@ -32,6 +32,8 @@ void processTextInternal(Message message, UpdateMessageHandler commandHandler) {
   commandHandler(MessageContext(
     userId: userId,
     chatId: chatId,
+    original: message,
+    locale: user?.languageCode,
     editMessageId: message.messageId,
     username: user?.username,
     text: message.text,
@@ -47,13 +49,16 @@ void processCallbackQuery(Update update, UpdateStepHandler commandHandler) {
     final chatId = message.chat.id;
     final userId = chatId; // TODO: Test for groups. message.from.id returns id of opponent
     final data = callbackQuery.data;
+    final user = message.from;
 
     commandHandler(
       MessageContext(
         userId: userId,
         chatId: chatId,
+        original: message,
+        locale: user?.languageCode,
         editMessageId: message.messageId,
-        username: message.from?.username,
+        username: user?.username,
       ),
       data!, //todo
     );
@@ -72,6 +77,8 @@ void processPreCheckoutQuery(Update update, UpdateStepHandler commandHandler) {
       MessageContext(
         userId: userId,
         chatId: userId, //todo check if can be coming from actual chat, not user
+        original: null,
+        locale: user.languageCode,
         username: user.username,
         preCheckoutInfo: preCheckoutQuery,
       ),
@@ -94,6 +101,8 @@ void processSuccessfulPayment(Update update, UpdateMessageHandler commandHandler
     MessageContext(
       userId: userId,
       chatId: chatId,
+      original: message,
+      locale: user?.languageCode,
       username: user?.username,
       successfulPayment: successfulPayment,
     ),
@@ -112,7 +121,7 @@ void processVideo(Update update, UpdateMessageHandler commandHandler) {
   _processMediaFile(
     update,
     (Message? message) {
-      var mediaFile = message?.video?.toMediaFile();
+      final mediaFile = message?.video?.toMediaFile();
       return mediaFile == null ? null : [mediaFile];
     },
     commandHandler,
@@ -123,7 +132,7 @@ void processSticker(Update update, UpdateMessageHandler commandHandler) {
   _processMediaFile(
     update,
     (Message? message) {
-      var mediaFile = message?.sticker?.toMediaFile();
+      final mediaFile = message?.sticker?.toMediaFile();
       return mediaFile == null ? null : [mediaFile];
     },
     commandHandler,
@@ -146,6 +155,8 @@ void _processMediaFile(
   commandHandler(MessageContext(
     userId: userId,
     chatId: chatId ?? userId,
+    original: message,
+    locale: user?.languageCode,
     username: user?.username ?? '',
     mediaFiles: files,
   ));

@@ -5,7 +5,7 @@ import 'package:dotenv/dotenv.dart';
 import 'package:example/flows/coundown_game.dart';
 import 'package:example/flows/menu.dart';
 import 'package:example/flows/start.dart';
-import 'package:example/flows/sticks_game.dart';
+import 'package:example/flows/twentyone_sticks_game/twentyone_sticks_game.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -32,7 +32,7 @@ Future<Response> _handleRequest(Request request) async {
     StartFlow(),
     MenuFlow(),
     CountdownGameFlow(),
-    TwentyOneSticksGameFlow(),
+    ...TwentyOneSticksGameFlow.flows,
   ];
 
   final requestBody = await request.readAsString();
