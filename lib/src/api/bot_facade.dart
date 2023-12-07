@@ -33,8 +33,12 @@ class BotFacadeImpl extends BotFacade {
     required InlineKeyboardMarkup replyMarkup,
     required bool markdown,
   }) async {
-    final message = await api.sendMessage(ChatID(chatId), text,
-        replyMarkup: replyMarkup, parseMode: markdown ? ParseMode.markdown : null);
+    final message = await api.sendMessage(
+      ChatID(chatId),
+      text,
+      replyMarkup: replyMarkup,
+      parseMode: markdown ? ParseMode.markdown : null,
+    );
     return message.messageId;
   }
 

@@ -1,3 +1,6 @@
+## 1.1.0
+- Fix command handling for media file processing
+
 ## 1.0.9 
 - Introduce possibility to send markdown v1 messages
 - Handle commands send as captions with media files

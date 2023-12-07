@@ -26,7 +26,7 @@ class Chatterbox {
           processCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process command /$command');
             await store.clearPending(messageContext.userId);
-            _handleCommand(command, message, messageContext);
+            _handleCommand(command, messageContext);
           });
         } else {
           processText(ctx.update, (messageContext) async {
@@ -57,7 +57,7 @@ class Chatterbox {
           if (command == null) {
             _flowManager.handle(messageContext);
           } else {
-            _handleCommand(command, messageContext.original!, messageContext);
+            _handleCommand(command, messageContext);
           }
         }));
 
@@ -66,7 +66,7 @@ class Chatterbox {
           if (command == null) {
             _flowManager.handle(messageContext);
           } else {
-            _handleCommand(command, messageContext.original!, messageContext);
+            _handleCommand(command, messageContext);
           }
         }));
 
@@ -75,7 +75,7 @@ class Chatterbox {
           if (command == null) {
             _flowManager.handle(messageContext);
           } else {
-            _handleCommand(command, messageContext.original!, messageContext);
+            _handleCommand(command, messageContext);
           }
         }));
 
@@ -104,39 +104,39 @@ class Chatterbox {
     }
   }
 
-  void _startCommandFlowForMessage(Flow flow, Message message) {
+  void _startCommandFlowForMessage(Flow flow, MessageContext message) {
     print('[Chatterbox] startFlowForMessage: ${message.text}');
     // TODO: Encode these args, because if stepUri is an argument it's not parsed properly
     final args = parseArgs(message.text);
-    final chatId = message.chat.id;
-
-    final user = message.from;
-    final trimmedText = _trimCommand(message.text);
 
     _flowManager.handle(
       MessageContext(
-        userId: user?.id ?? chatId,
-        chatId: chatId,
-        original: message,
-        username: user?.username,
-        locale: user?.languageCode,
-        text: trimmedText,
+        userId: message.userId,
+        chatId: message.chatId,
+        original: message.original,
+        text: _trimCommand(message.text),
+        editMessageId: message.editMessageId,
+        locale: message.locale,
+        username: message.username,
+        mediaFiles: message.mediaFiles,
+        preCheckoutInfo: message.preCheckoutInfo,
+        successfulPayment: message.successfulPayment,
       ),
       flow.initialStep.uri.appendArgs(args),
     );
   }
 
-  void _handleCommand(String command, Message message, MessageContext messageContext) {
+  void _handleCommand(String command, MessageContext messageContext) {
     final flow = flows.whereType<CommandFlow>().firstWhereOrNull((flow) => flow.command == command);
     if (flow != null) {
-      _startCommandFlowForMessage(flow, message);
+      _startCommandFlowForMessage(flow, messageContext);
     } else {
       print('[Chatterbox] Flow for $command not found!'); //todo Log.e
     }
   }
 }
 
-///removes command that starts with / and returnds the rest of the text
+///removes command that starts with / and returns the rest of the text
 String? _trimCommand(String? text) {
   final index = text?.indexOf(' ') ?? -1;
   if (index == -1 || text == null) {
