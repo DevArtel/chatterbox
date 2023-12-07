@@ -1,12 +1,11 @@
-import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/model/inline_button.dart';
 import 'package:televerse/telegram.dart';
 
-String? parseCommand(Message? message) {
-  final entity = message?.entities?.first;
+String? parseCommand(String? text, List<MessageEntity>? entities) {
+  final entity = entities?.first;
   final offset = (entity?.offset ?? 0) + 1;
   final length = entity?.length ?? 0;
-  return message?.text?.substring(offset, offset + length - 1);
+  return text?.substring(offset, offset + length - 1);
 }
 
 List<String> parseArgs(String? text) {
@@ -20,31 +19,6 @@ List<String> parseArgs(String? text) {
     return words;
   }
   return [];
-}
-
-Future<int?> replyWithButtons(
-  BotFacade bot,
-  int chatId, {
-  int? editMessageId,
-  required String text,
-  required List<InlineButton> buttons,
-}) async {
-  if (editMessageId == null) {
-    print('[ChatUtils] replyWithButtons new message');
-    return bot.sendMessage(
-      chatId,
-      text,
-      replyMarkup: createButtons(buttons),
-    );
-  } else {
-    print('[ChatUtils] replyWithButtons edit message with id: $editMessageId');
-    return bot.editMessageText(
-      chatId,
-      editMessageId,
-      text: text,
-      replyMarkup: createButtons(buttons),
-    );
-  }
 }
 
 InlineKeyboardMarkup createButtons(List<InlineButton> buttons) {

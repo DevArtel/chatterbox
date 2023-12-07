@@ -72,9 +72,13 @@ class FlowManagerImpl implements FlowManager {
   }
 
   Future<void> processResult(FlowStep flowStep, List<String>? args, MessageContext messageContext) async {
-    final reaction = await flowStep.handle(messageContext, args);
-    final int? responseMessageId = await _react(reaction, messageContext);
-    reaction.postCallback?.call(responseMessageId);
+    try {
+      final reaction = await flowStep.handle(messageContext, args);
+      final int? responseMessageId = await _react(reaction, messageContext);
+      reaction.postCallback?.call(responseMessageId);
+    } catch (error, st) {
+      print('[FlowManager] Error while processing result: $error\n${st.toString()}');
+    }
   }
 
   /// @return sent message id
@@ -90,6 +94,7 @@ class FlowManagerImpl implements FlowManager {
               reactionResponse.editMessageId,
               reactionResponse.text,
               reactionResponse.buttons,
+              reactionResponse.markdown,
             );
           }(),
         (final ReactionRedirect reactionRedirect) => () {
@@ -103,6 +108,7 @@ class FlowManagerImpl implements FlowManager {
                     reactionRedirect.editMessageId,
                     text,
                     [],
+                    reactionRedirect.markdown,
                   )
                 : null;
             processResult(step!, args, messageContext);
@@ -117,13 +123,14 @@ class FlowManagerImpl implements FlowManager {
             );
             return sendMessageId;
           }(),
-        (final ReactionForeignResponse reactionForeignResponse) =>
+        (final ReactionForeignResponse reaction) =>
           // final reactionForeignResponse = result as ReactionForeignResponse;
           bot.replyWithButtons(
-            reactionForeignResponse.foreignUserId,
-            reactionForeignResponse.editMessageId,
-            reactionForeignResponse.text,
-            reactionForeignResponse.buttons,
+            reaction.foreignUserId,
+            reaction.editMessageId,
+            reaction.text,
+            reaction.buttons,
+            reaction.markdown,
           ),
         (final ReactionComposed reactionComposed) => () async {
             for (var response in reactionComposed.responses) {

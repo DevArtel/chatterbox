@@ -1,3 +1,8 @@
+## 1.0.9 
+- Introduce possibility to send markdown v1 messages
+- Handle commands send as captions with media files
+- Fix MessageContext#user field for CallbackQuery flow
+
 ## 1.0.8 Locale
 - Add original message to MessageContext
 - When receiving a command pass text via MessageContext.text field

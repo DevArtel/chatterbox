@@ -12,6 +12,9 @@ class ReactionResponse extends Reaction {
   /// Text to send to user
   final String text;
 
+  /// If true, then text will be parsed as markdown
+  final bool markdown;
+
   /// Instead of sending new message to user this message will be updated
   final int? editMessageId;
 
@@ -24,8 +27,10 @@ class ReactionResponse extends Reaction {
   /// Determins when to trigger afterReplyUri. If null, then it will be triggered after any user reply
   AfterReplyUriFilter? afterReplyUriTrigger;
 
+
   ReactionResponse({
     required this.text,
+    this.markdown = false,
     this.editMessageId,
     this.buttons = const [],
     this.afterReplyUri,
@@ -37,11 +42,13 @@ class ReactionResponse extends Reaction {
 class ReactionRedirect extends Reaction {
   final String stepUri;
   final String? text;
+  final bool markdown;
   final int? editMessageId;
 
   ReactionRedirect({
     required this.stepUri,
     this.text,
+    this.markdown = false,
     this.editMessageId,
     Function(int?)? postCallback,
   }) : super(postCallback);
@@ -72,6 +79,7 @@ class ReactionNone extends Reaction {
 class ReactionForeignResponse extends Reaction {
   final int foreignUserId;
   final String text;
+  final bool markdown;
   final int? editMessageId;
   final List<InlineButton> buttons;
   final StickerModel? sticker;
@@ -80,6 +88,7 @@ class ReactionForeignResponse extends Reaction {
   ReactionForeignResponse({
     required this.foreignUserId,
     required this.text,
+    this.markdown = false,
     this.editMessageId,
     this.buttons = const [],
     this.sticker,

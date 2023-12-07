@@ -52,21 +52,33 @@ class Chatterbox {
           _flowManager.handle(messageContext);
         }));
 
-    _bot.onPhoto((ctx) => processPhoto(ctx.update, (messageContext) async {
+    _bot.onPhoto((ctx) => processPhoto(ctx.update, (messageContext, command) async {
           print('[Chatterbox] on photo, count: ${messageContext.mediaFiles?.length ?? 0}');
-          _flowManager.handle(messageContext);
+          if (command == null) {
+            _flowManager.handle(messageContext);
+          } else {
+            _handleCommand(command, messageContext.original!, messageContext);
+          }
         }));
 
-    _bot.onVideo((ctx) => processVideo(ctx.update, (messageContext) async {
+    _bot.onVideo((ctx) => processVideo(ctx.update, (messageContext, command) async {
           print('[Chatterbox] on video, count: ${messageContext.mediaFiles?.length ?? 0}');
-          _flowManager.handle(messageContext);
+          if (command == null) {
+            _flowManager.handle(messageContext);
+          } else {
+            _handleCommand(command, messageContext.original!, messageContext);
+          }
         }));
 
-    _bot.onSticker((ctx) => processSticker(ctx.update, (messageContext) async {
+    _bot.onSticker((ctx) => processSticker(ctx.update, (messageContext, command) async {
           print('[Chatterbox] on sticker, count: ${messageContext.mediaFiles?.length ?? 0}');
-          _flowManager.handle(messageContext);
+          if (command == null) {
+            _flowManager.handle(messageContext);
+          } else {
+            _handleCommand(command, messageContext.original!, messageContext);
+          }
         }));
-    //
+
     // _bot.onAnimation((ctx) => processPhoto(ctx.update, (messageContext) async {
     //       print('[Chatterbox] on animation, count: ${messageContext.mediaFiles?.length ?? 0}');
     //       _flowManager.handle(messageContext);

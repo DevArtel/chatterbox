@@ -6,12 +6,17 @@ import 'package:televerse/televerse.dart';
 typedef JsonData = Map<String, dynamic>;
 
 abstract class BotFacade {
-  Future<int> sendMessage(int chatId, String text, {required InlineKeyboardMarkup replyMarkup});
+  Future<int> sendMessage(int chatId, String text, {required InlineKeyboardMarkup replyMarkup, required bool markdown});
 
-  Future<int> editMessageText(int chatId, int editMessageId,
-      {required String text, required InlineKeyboardMarkup replyMarkup});
+  Future<int> editMessageText(
+    int chatId,
+    int editMessageId, {
+    required String text,
+    required InlineKeyboardMarkup replyMarkup,
+    required bool markdown,
+  });
 
-  Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons);
+  Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons, bool markdown);
 
   Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri, int? editMessageId);
 }
@@ -22,27 +27,51 @@ class BotFacadeImpl extends BotFacade {
   RawAPI api;
 
   @override
-  Future<int> sendMessage(int chatId, String text, {required InlineKeyboardMarkup replyMarkup}) async {
-    final message = await api.sendMessage(ChatID(chatId), text, replyMarkup: replyMarkup);
+  Future<int> sendMessage(
+    int chatId,
+    String text, {
+    required InlineKeyboardMarkup replyMarkup,
+    required bool markdown,
+  }) async {
+    final message = await api.sendMessage(ChatID(chatId), text,
+        replyMarkup: replyMarkup, parseMode: markdown ? ParseMode.markdown : null);
     return message.messageId;
   }
 
   @override
-  Future<int> editMessageText(int chatId, int editMessageId,
-      {required String text, required InlineKeyboardMarkup replyMarkup}) async {
-    final message = await api.editMessageText(ChatID(chatId), editMessageId, text, replyMarkup: replyMarkup);
+  Future<int> editMessageText(
+    int chatId,
+    int editMessageId, {
+    required String text,
+    required InlineKeyboardMarkup replyMarkup,
+    required bool markdown,
+  }) async {
+    final message = await api.editMessageText(
+      ChatID(chatId),
+      editMessageId,
+      text,
+      replyMarkup: replyMarkup,
+      parseMode: markdown ? ParseMode.markdown : null,
+    );
     return message.messageId;
   }
 
   @override
-  Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons) async {
+  Future<int> replyWithButtons(
+      int chatId, int? editMessageId, String text, List<InlineButton> buttons, bool markdown) async {
     _verifyButtons(buttons);
     if (editMessageId == null) {
       print("[ChatUtils] replyWithButtons new message");
-      return sendMessage(chatId, text, replyMarkup: createButtons(buttons));
+      return sendMessage(chatId, text, replyMarkup: createButtons(buttons), markdown: markdown);
     } else {
       print("[ChatUtils] replyWithButtons edit message with id: $editMessageId");
-      return editMessageText(chatId, editMessageId, text: text, replyMarkup: createButtons(buttons));
+      return editMessageText(
+        chatId,
+        editMessageId,
+        text: text,
+        replyMarkup: createButtons(buttons),
+        markdown: markdown,
+      );
     }
   }
 
@@ -79,7 +108,8 @@ class BotFacadeImpl extends BotFacade {
       replyMarkup: invoiceInfo.replyMarkup,
     );
 
-    if (editMessageId != null) { //todo telegram message window is blinking when deleting instead of editing
+    if (editMessageId != null) {
+      //todo telegram message window is blinking when deleting instead of editing
       await api.deleteMessage(ChatID(chatId), editMessageId);
     }
     return message.messageId;
