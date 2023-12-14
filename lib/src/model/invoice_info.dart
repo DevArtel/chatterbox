@@ -41,7 +41,7 @@ class InvoiceInfo {
   int maxTipAmount;
   List<int>? suggestedTipAmounts;
   String? startParameter;
-  String? providerData;
+  dynamic providerData;
   String? photoUrl;
   int? photoSize;
   int? photoWidth;

@@ -2,13 +2,19 @@ name: chatterbox
 description: Framework to build dialog flows for Telegram Bots
 version: 1.1.0
 repository: https://dart.dev/tools/pub/publishing
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
   sdk: ^3.0.5
 
 dependencies:
   # APIs
-  televerse: ^1.11.2
+#  televerse: ^1.11.2
+  televerse:
+    git:
+      url: https://github.com/Defuera/televerse
+      ref: fix/provider_data_type_dynamic
+
 
   # Utils
   collection: ^1.18.0
