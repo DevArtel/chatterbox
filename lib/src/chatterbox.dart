@@ -99,8 +99,8 @@ class Chatterbox {
     try {
       final update = Update.fromJson(updateJson);
       _bot.handleUpdate(update);
-    } catch (error) {
-      print('[Chatterbox] invokeFromWebhook failed: ${error.toString()}');
+    } catch (error, stacktrace) {
+      print('[Chatterbox] invokeFromWebhook failed: ${error.toString()}\n$stacktrace');
     }
   }
 
