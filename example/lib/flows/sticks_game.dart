@@ -18,7 +18,7 @@ class TwentyOneSticksGameFlow extends CommandFlow {
 
   @override
   List<StepFactory> get steps => [
-        () => GameInitialStep(),
+        () => StartStep(),
         () => _UserTurnStep(),
         () => _BotTurnStep(),
         () => _GameProcessingStep(),
@@ -27,7 +27,7 @@ class TwentyOneSticksGameFlow extends CommandFlow {
       ];
 }
 
-class GameInitialStep extends FlowStep {
+class StartStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionComposed(responses: [
@@ -72,7 +72,6 @@ class _GameProcessingStep extends FlowStep {
     };
 
     return ReactionComposed(responses: [
-      // Remove buttons and update message with info on how many sticks user drew
       if (actor == _Player.user)
         ReactionResponse(
           text: 'There are $originalNumber sticks.\n\nYou took out $playerChoice sticks.',
