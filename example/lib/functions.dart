@@ -6,16 +6,12 @@ import 'package:example/flows/coundown_game.dart';
 import 'package:example/flows/menu.dart';
 import 'package:example/flows/start.dart';
 import 'package:example/flows/sticks_game.dart';
+import 'package:functions_framework/functions_framework.dart';
 import 'package:shelf/shelf.dart';
-import 'package:shelf/shelf_io.dart' as shelf_io;
 
-void main() async {
-  final handler = const Pipeline().addMiddleware(logRequests()).addHandler(_handleRequest);
-  final server = await shelf_io.serve(handler, 'localhost', 8080);
-
-  server.autoCompress = true;
-
-  print('Serving at http://${server.address.host}:${server.port}');
+@CloudFunction()
+Future<Response> function(Request request) async {
+  return _handleRequest(request);
 }
 
 final store = InMemoryStore();
