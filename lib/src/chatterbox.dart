@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:chatterbox/chatterbox.dart';
 import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
-import 'package:chatterbox/src/utils/televerse_extensions.dart';
 import 'package:chatterbox/src/utils/update_processing_utils.dart';
 import 'package:collection/collection.dart';
 import 'package:televerse/telegram.dart';
