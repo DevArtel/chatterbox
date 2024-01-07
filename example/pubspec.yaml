@@ -16,6 +16,9 @@ dependencies:
   functions_framework: ^0.4.0
   shelf: ^1.4.1
 
+  # Storage
+  firedart: ^0.9.7
+
 dev_dependencies:
 
   # Code generation

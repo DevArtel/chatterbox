@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# Paths of files relative to root since scripts are to be invoked from Makefile
+ENV_FILE=".env"
+
 # Load environment variables from .env file
-if [ -f ./.env ]; then
-  export $(cat ./.env | xargs)
+if [ -f $ENV_FILE ]; then
+  export $(grep -v '^#' $ENV_FILE | xargs)
 fi
 
 # Retrieve the ngrok URL
@@ -22,17 +25,3 @@ if [[ $NGROK_URL == http* ]]; then
 else
   echo "Failed to retrieve ngrok URL."
 fi
-
-
-curl --location 'https://api.telegram.org/bot{{BOT_TOKEN}}/setWebhook' \
---header 'Content-Type: application/json' \
---data '{
-"url": "{{NGROK_URL}}"
-}'
-
-
-
-
-
-
-
