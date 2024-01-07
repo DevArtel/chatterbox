@@ -16,6 +16,11 @@ Future<Response> function(Request request) async {
 }
 
 Future<Response> _handleRequest(Request request) async {
+  print('Request for "${request.url}"');
+
+  final requestBody = await request.readAsString();
+  print('Request body: ${requestBody}');
+
   final env = DotEnv(includePlatformEnvironment: false)..load();
   final botToken = env['BOT_TOKEN'];
 
@@ -32,7 +37,6 @@ Future<Response> _handleRequest(Request request) async {
     TwentyOneSticksGameFlow(),
   ];
 
-  final requestBody = await request.readAsString();
   final bodyMap = json.decode(requestBody);
   Chatterbox(botToken: botToken, flows: flows, store: FirebaseDialogStore()).invokeFromWebhook(bodyMap);
 
