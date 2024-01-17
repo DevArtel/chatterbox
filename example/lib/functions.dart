@@ -21,7 +21,7 @@ Future<Response> _handleRequest(Request request) async {
   final requestBody = await request.readAsString();
   print('Request body: ${requestBody}');
 
-  final env = DotEnv(includePlatformEnvironment: false)..load();
+  final env = DotEnv()..load();
   final botToken = env['BOT_TOKEN'];
 
   if (botToken == null) {
