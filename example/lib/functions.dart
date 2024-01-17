@@ -21,8 +21,10 @@ Future<Response> _handleRequest(Request request) async {
   final requestBody = await request.readAsString();
   print('Request body: ${requestBody}');
 
-  final env = DotEnv()..load();
+  final env = DotEnv(includePlatformEnvironment: true)..load();
   final botToken = env['BOT_TOKEN'];
+
+  print('Continue with bot token ${botToken?.substring(0, 8)}');
 
   if (botToken == null) {
     return Response.internalServerError(body: 'Missing BOT_TOKEN environment variable ');

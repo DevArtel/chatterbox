@@ -5,8 +5,16 @@ steps:
       - '-c'
       - >
         echo "Retrieving .env file from Secret Manager"
+        gcloud secrets versions access latest --secret='ENV' --project='chatterbox-example' > .env
 
-        gcloud secrets versions access latest --secret='ENV' --project='chatterbox-example' > /app/.env
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: bash
+    args:
+      - '-c'
+      - >
+        echo "Printing current directory recursively"
+        ls -R .
+
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -18,6 +26,7 @@ steps:
       - '-f'
       - Dockerfile
     id: Build
+
   - name: gcr.io/cloud-builders/docker
     args:
       - push
@@ -39,18 +48,22 @@ steps:
       - '--quiet'
     id: Deploy
     entrypoint: gcloud
+
 images:
   - >-
     $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+
 options:
   substitutionOption: ALLOW_LOOSE
   logging: CLOUD_LOGGING_ONLY
+
 substitutions:
   _TRIGGER_ID: 5ef3e619-e189-4be4-ab47-60b9a1e06cc3
   _SERVICE_NAME: chatterbox
   _DEPLOY_REGION: europe-central2
   _AR_HOSTNAME: europe-central2-docker.pkg.dev
   _PLATFORM: managed
+
 tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
