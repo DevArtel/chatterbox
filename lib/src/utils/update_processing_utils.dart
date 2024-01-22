@@ -45,7 +45,7 @@ void processCallbackQuery(Update update, UpdateStepHandler commandHandler) {
   final callbackQuery = update.callbackQuery;
   if (callbackQuery != null) {
     final message = callbackQuery.message;
-    if (message == null) return;
+    if (message == null || message is! Message) return;
 
     final chatId = message.chat.id;
     final userId = chatId; // TODO: Test for groups. message.from.id returns id of opponent

@@ -81,6 +81,8 @@ class BotFacadeImpl extends BotFacade {
 
   @override
   Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri, int? editMessageId) async {
+    final replyToMessageId = invoiceInfo.replyToMessageId;
+
     final message = await api.sendInvoice(
       ChatID(chatId),
       title: invoiceInfo.title,
@@ -107,8 +109,12 @@ class BotFacadeImpl extends BotFacade {
       isFlexible: invoiceInfo.isFlexible,
       disableNotification: invoiceInfo.disableNotification,
       protectContent: invoiceInfo.protectContent,
-      replyToMessageId: invoiceInfo.replyToMessageId,
-      allowSendingWithoutReply: invoiceInfo.allowSendingWithoutReply,
+      replyParameters: replyToMessageId != null
+          ? ReplyParameters(
+              messageId: replyToMessageId,
+              allowSendingWithoutReply: invoiceInfo.allowSendingWithoutReply,
+            )
+          : null,
       replyMarkup: invoiceInfo.replyMarkup,
     );
 
