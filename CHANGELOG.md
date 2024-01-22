@@ -1,3 +1,9 @@
+## 1.3.0
+- Update Televerse dependency to 1.12.7
+
+## 1.2.0
+- Introduce Invoice payment flow
+
 ## 1.1.0
 - Fix command handling for media file processing
 
