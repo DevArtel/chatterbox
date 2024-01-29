@@ -18,7 +18,7 @@ void processText(Update update, UpdateMessageHandler commandHandler) {
 void processChannelText(Update update, UpdateMessageHandler commandHandler) {
   final message = update.channelPost;
   if (message != null) {
-    processTextInternal(message, commandHandler);
+    processChannelTextInternal(message, commandHandler);
   }
 }
 
@@ -50,6 +50,24 @@ void processTextInternal(Message message, UpdateMessageHandler commandHandler) {
     chatId: chatId,
     original: message,
     locale: user?.languageCode,
+    editMessageId: message.messageId,
+    username: user?.username,
+    text: message.text,
+  ));
+}
+
+void processChannelTextInternal(Message message, UpdateMessageHandler commandHandler) {
+  final chatId = message.chat.id;
+  final user = message.senderChat;
+  final userId = user?.id;
+
+  if (userId == null) return;
+
+  commandHandler(MessageContext(
+    userId: userId,
+    chatId: chatId,
+    original: message,
+    locale: null,
     editMessageId: message.messageId,
     username: user?.username,
     text: message.text,
