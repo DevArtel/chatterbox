@@ -1,3 +1,6 @@
+## 1.3.1
+- Point Televerse to alternative repo with fix For StickerSet model until official Televerse fix is released
+
 ## 1.3.0
 - Update Televerse dependency to 1.12.7
 
