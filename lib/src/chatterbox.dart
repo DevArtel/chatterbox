@@ -40,13 +40,13 @@ class Chatterbox {
       (ctx) {
         final message = ctx.message;
         if (message.isCommand) {
-          processCommand(ctx.update, (messageContext, command) async {
+          processChannelCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process channel command /$command');
             await store.clearPending(messageContext.userId);
             _handleCommand(command, messageContext);
           });
         } else {
-          processText(ctx.update, (messageContext) async {
+          processChannelText(ctx.update, (messageContext) async {
             print('[Chatterbox] Process channel text message: $message');
             _flowManager.handle(messageContext, null);
           });

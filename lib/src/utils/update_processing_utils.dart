@@ -15,8 +15,23 @@ void processText(Update update, UpdateMessageHandler commandHandler) {
   }
 }
 
+void processChannelText(Update update, UpdateMessageHandler commandHandler) {
+  final message = update.channelPost;
+  if (message != null) {
+    processTextInternal(message, commandHandler);
+  }
+}
+
 void processCommand(Update update, UpdateCommandHandler commandHandler) {
   final message = update.message;
+  final command = parseCommand(message?.text, message?.entities);
+  if (message != null && command != null) {
+    processTextInternal(message, (messageContext) => commandHandler(messageContext, command));
+  }
+}
+
+void processChannelCommand(Update update, UpdateCommandHandler commandHandler) {
+  final message = update.channelPost;
   final command = parseCommand(message?.text, message?.entities);
   if (message != null && command != null) {
     processTextInternal(message, (messageContext) => commandHandler(messageContext, command));
