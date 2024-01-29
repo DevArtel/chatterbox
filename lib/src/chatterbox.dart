@@ -36,6 +36,24 @@ class Chatterbox {
       },
     );
 
+    _bot.onChannelPost(
+      (ctx) {
+        final message = ctx.message;
+        if (message.isCommand) {
+          processCommand(ctx.update, (messageContext, command) async {
+            print('[Chatterbox] Process channel command /$command');
+            await store.clearPending(messageContext.userId);
+            _handleCommand(command, messageContext);
+          });
+        } else {
+          processText(ctx.update, (messageContext) async {
+            print('[Chatterbox] Process channel text message: $message');
+            _flowManager.handle(messageContext, null);
+          });
+        }
+      },
+    );
+
     _bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update, (messageContext, stepUri) async {
           print('[Chatterbox] Process callback query $stepUri');
           _flowManager.handle(messageContext, stepUri);

@@ -1,3 +1,6 @@
+## 1.4.0
+ - Add onChannelPost handler
+
 ## 1.3.1
 - Point Televerse to alternative repo with fix For StickerSet model until official Televerse fix is released
 
