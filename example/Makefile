@@ -1,11 +1,7 @@
 .PHONY: clean
 
-FUNCTION_TARGET = function
-PORT = 8080
-
 clean:
 	dart run build_runner clean
-	rm -rf bin/server.dart
 
 run:
 	make gen_all
