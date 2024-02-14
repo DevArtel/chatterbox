@@ -83,7 +83,7 @@ void processCallbackQuery(Update update, UpdateStepHandler commandHandler) {
     final chatId = message.chat.id;
     final userId = chatId; // TODO: Test for groups. message.from.id returns id of opponent
     final data = callbackQuery.data;
-    final user = callbackQuery.user;
+    final user = callbackQuery.from;
 
     commandHandler(
       MessageContext(

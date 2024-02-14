@@ -8,11 +8,7 @@ environment:
 
 dependencies:
   # APIs
-#  televerse: ^1.12.7
-  televerse:
-    git:
-      url: https://github.com/Defuera/televerse.git
-      ref: fix/model_sticker_set
+  televerse: ^1.13.1
 
   # Utils
   collection: ^1.18.0

@@ -1,3 +1,6 @@
+## 1.5.0
+ - Update Televerse dependency to 1.13.1
+
 ## 1.4.0
  - Add onChannelPost handler
 

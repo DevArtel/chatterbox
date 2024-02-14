@@ -6,7 +6,7 @@ import 'package:chatterbox/src/utils/chat_utils.dart';
 import 'package:chatterbox/src/utils/update_processing_utils.dart';
 import 'package:collection/collection.dart';
 import 'package:televerse/telegram.dart';
-import 'package:televerse/televerse.dart' hide MessageContext;
+import 'package:televerse/televerse.dart';
 
 class Chatterbox {
   final List<Flow> flows;
@@ -21,6 +21,9 @@ class Chatterbox {
     _bot.onText(
       (ctx) {
         final message = ctx.message;
+        if (message == null) {
+          return;
+        }
         if (message.isCommand) {
           processCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process command /$command');
@@ -39,6 +42,9 @@ class Chatterbox {
     _bot.onChannelPost(
       (ctx) {
         final message = ctx.message;
+        if (message == null) {
+          return;
+        }
         if (message.isCommand) {
           processChannelCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process channel command /$command');
