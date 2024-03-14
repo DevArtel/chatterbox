@@ -1,5 +1,8 @@
 .PHONY: clean
 
+FUNCTION_TARGET = function
+PORT = 8080
+
 clean:
 	dart run build_runner clean
 
