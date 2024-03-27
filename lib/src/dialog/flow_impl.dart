@@ -31,7 +31,7 @@ class FlowManagerImpl implements FlowManager {
 
     print("Handle invoked $userId $editMessageId ${messageContext.text}");
 
-    final String? pendingStepUrl = await store.retrievePending(userId);
+    final String? pendingStepUrl = await _processPending(stepUri, userId);
     final pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri);
     final pendingStep = pendingData.$1;
     final pendingArgs = pendingData.$2;
@@ -46,7 +46,8 @@ class FlowManagerImpl implements FlowManager {
       print("[FlowManager] Not handled");
       return false;
     } else if (pendingStep != null && stepUri != null) {
-      print("[FlowManager] illegal state: PENDING AND StepUri BOTH NOT NULL");
+      print(
+          "[FlowManager] illegal state: This should never happen: _processPending should override pending step if stepUri is present");
       return false;
     } else if (pendingStep != null) {
       print("[FlowManager] Processing pending step");
@@ -69,6 +70,17 @@ class FlowManagerImpl implements FlowManager {
 
     print("[FlowManager] MISSING CASE OMG!");
     return false;
+  }
+
+  /// StepUri overrides pending.
+  /// If user presented with an option to submit text or press button button is primary
+  Future<String?> _processPending(StepUri? stepUri, int userId) async {
+    if (stepUri != null) {
+      await store.clearPending(userId);
+      return null;
+    } else {
+      return store.retrievePending(userId);
+    }
   }
 
   Future<void> processResult(FlowStep flowStep, List<String>? args, MessageContext messageContext) async {
