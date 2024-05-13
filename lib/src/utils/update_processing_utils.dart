@@ -15,12 +15,12 @@ void processText(Update update, UpdateMessageHandler commandHandler) {
   }
 }
 
-void processChannelText(Update update, UpdateMessageHandler commandHandler) {
-  final message = update.channelPost;
-  if (message != null) {
-    processChannelTextInternal(message, commandHandler);
-  }
-}
+// void processChannelText(Update update, UpdateMessageHandler commandHandler) {
+//   final message = update.channelPost;
+//   if (message != null) {
+//     processChannelTextInternal(message, commandHandler);
+//   }
+// }
 
 void processCommand(Update update, UpdateCommandHandler commandHandler) {
   final message = update.message;
@@ -30,13 +30,31 @@ void processCommand(Update update, UpdateCommandHandler commandHandler) {
   }
 }
 
-void processChannelCommand(Update update, UpdateCommandHandler commandHandler) {
-  final message = update.channelPost;
-  final command = parseCommand(message?.text, message?.entities);
-  if (message != null && command != null) {
-    processTextInternal(message, (messageContext) => commandHandler(messageContext, command));
-  }
-}
+// void processChannelCommand(Update update, UpdateCommandHandler commandHandler) {
+//   final message = update.channelPost;
+//   final command = parseCommand(message?.text, message?.entities);
+//   if (message != null && command != null) {
+//     // processTextInternal(message, (messageContext) => commandHandler(messageContext, command));
+//     final chatId = message.chat.id;
+//     final user = message.from;
+//     final userId = user?.id;
+//
+//     if (userId == null) return;
+//
+//     commandHandler(
+//       MessageContext(
+//         userId: userId,
+//         chatId: chatId,
+//         original: message,
+//         locale: user?.languageCode,
+//         editMessageId: message.messageId,
+//         username: user?.username,
+//         text: message.text,
+//       ),
+//       command,
+//     );
+//   }
+// }
 
 void processTextInternal(Message message, UpdateMessageHandler commandHandler) {
   final chatId = message.chat.id;
@@ -56,23 +74,23 @@ void processTextInternal(Message message, UpdateMessageHandler commandHandler) {
   ));
 }
 
-void processChannelTextInternal(Message message, UpdateMessageHandler commandHandler) {
-  final chatId = message.chat.id;
-  final user = message.senderChat;
-  final userId = user?.id;
-
-  if (userId == null) return;
-
-  commandHandler(MessageContext(
-    userId: userId,
-    chatId: chatId,
-    original: message,
-    locale: null,
-    editMessageId: message.messageId,
-    username: user?.username,
-    text: message.text,
-  ));
-}
+// void processChannelTextInternal(Message message, UpdateMessageHandler commandHandler) {
+//   final chatId = message.chat.id;
+//   final user = message.senderChat;
+//   final userId = user?.id;
+//
+//   if (userId == null) return;
+//
+//   commandHandler(MessageContext(
+//     userId: userId,
+//     chatId: chatId,
+//     original: message,
+//     locale: null,
+//     editMessageId: message.messageId,
+//     username: user?.username,
+//     text: message.text,
+//   ));
+// }
 
 void processCallbackQuery(Update update, UpdateStepHandler commandHandler) {
   final callbackQuery = update.callbackQuery;

@@ -29,7 +29,8 @@ class FlowManagerImpl implements FlowManager {
     final userId = messageContext.userId;
     final editMessageId = messageContext.editMessageId;
 
-    print("Handle invoked $userId $editMessageId ${messageContext.text}");
+    final withMessage = messageContext.text == null ? "without message" : "with message '${messageContext.text}'";
+    print("Handle invoked by $userId in ${messageContext.source.name}:${messageContext.chatId}: $withMessage");
 
     final String? pendingStepUrl = await _processPending(stepUri, userId);
     final pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri);

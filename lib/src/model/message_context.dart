@@ -1,6 +1,13 @@
 import 'package:chatterbox/src/model/media_file.dart';
 import 'package:chatterbox/src/model/sticker_model.dart';
 import 'package:televerse/telegram.dart';
+import 'package:televerse/televerse.dart';
+
+enum Source {
+  private,
+  group,
+  channel,
+}
 
 class MessageContext {
   final int userId;
@@ -18,6 +25,17 @@ class MessageContext {
   final SuccessfulPayment? successfulPayment;
 
   final Message? original;
+
+  Source get source {
+    final chatType = original?.chat.type;
+    ChatType.private;
+    return switch (chatType) {
+      ChatType.sender || ChatType.private => Source.private,
+      ChatType.supergroup || ChatType.group => Source.group,
+      ChatType.channel => Source.channel,
+      _ => throw Exception('Not supported for this kind of message yet, pls update the lib'),
+    };
+  }
 
   MessageContext({
     required this.userId,

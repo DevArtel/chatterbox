@@ -19,6 +19,7 @@ class Chatterbox {
     _flowManager = FlowManagerImpl(BotFacadeImpl(_bot.api), store, flows);
 
     _bot.onText(
+      // includeChannelPosts: true,
       (ctx) {
         final message = ctx.message;
         if (message == null) {
@@ -32,33 +33,47 @@ class Chatterbox {
           });
         } else {
           processText(ctx.update, (messageContext) async {
-            print('[Chatterbox] Process text message: $message');
+            print('[Chatterbox] Process text message: ${message.text}');
             _flowManager.handle(messageContext, null);
           });
         }
       },
     );
 
-    _bot.onChannelPost(
+    _bot.onCommand(
       (ctx) {
         final message = ctx.message;
         if (message == null) {
           return;
         }
-        if (message.isCommand) {
-          processChannelCommand(ctx.update, (messageContext, command) async {
-            print('[Chatterbox] Process channel command /$command');
-            await store.clearPending(messageContext.userId);
-            _handleCommand(command, messageContext);
-          });
-        } else {
-          processChannelText(ctx.update, (messageContext) async {
-            print('[Chatterbox] Process channel text message: $message');
-            _flowManager.handle(messageContext, null);
-          });
-        }
+        processCommand(ctx.update, (messageContext, command) async {
+          print('[Chatterbox] Process command /$command');
+          await store.clearPending(messageContext.userId);
+          _handleCommand(command, messageContext);
+        });
       },
     );
+
+    // _bot.onChannelPost(
+    //       (ctx) {
+    //     final message = ctx.update.channelPost;
+    //     if (message == null) {
+    //       return;
+    //     }
+    //     if (message.isCommand) {
+    //       processChannelCommand(ctx.update, (messageContext, command) async {
+    //         print('[Chatterbox] Process channel command /$command');
+    //         await store.clearPending(messageContext.userId);
+    //         _handleCommand(command, messageContext);
+    //       });
+    //     } else {
+    //       processChannelText(ctx.update, (messageContext) async {
+    //         print('[Chatterbox] Process channel text message: ${message.text}');
+    //         _flowManager.handle(messageContext, null);
+    //       });
+    //     }
+    //   },
+    // );
 
     _bot.onCallbackQuery((ctx) => processCallbackQuery(ctx.update, (messageContext, stepUri) async {
           print('[Chatterbox] Process callback query $stepUri');
