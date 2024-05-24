@@ -18,8 +18,8 @@ abstract class Flow {
 
 typedef StepUri = String;
 
-const delimiter = "^";
-const argsDelimiter = "-";
+const delimiter = "§";
+const argsDelimiter = "¶";
 
 extension StepUriExtensions on StepUri {
   StepUri appendArgs([List<String>? args]) {

@@ -1,3 +1,7 @@
+## 1.7.1
+
+- Fix: Negative int values cannot be used as args between steps
+
 ## 1.7.0
 
 - Group Interactions: Added support for bot interactions within Telegram groups.
