@@ -2,9 +2,9 @@
 abstract class PendingMessagesStore {
   const PendingMessagesStore();
 
-  Future<String?> retrievePending(int userId);
+  Future<String?> retrievePending(int userId, int chatId);
 
-  Future<void> setPending(int userId, String stepUrl);
+  Future<void> setPending(int userId, int chatId, String stepUrl);
 
-  Future<void> clearPending(int userId);
+  Future<void> clearPending(int userId, int chatId);
 }

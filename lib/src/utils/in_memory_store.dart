@@ -5,20 +5,20 @@ import 'package:chatterbox/chatterbox.dart';
 class InMemoryStore implements PendingMessagesStore {
   InMemoryStore() : super();
 
-  final map = <int, String>{};
+  final map = <String, String>{};
 
   @override
-  Future<void> clearPending(int userId) async {
-    map.remove(userId);
+  Future<void> clearPending(int userId, int chatId) async {
+    map.remove('$chatId-$userId');
   }
 
   @override
-  Future<String?> retrievePending(int userId) async {
-    return map[userId];
+  Future<String?> retrievePending(int userId, int chatId) async {
+    return map['$chatId-$userId'];
   }
 
   @override
-  Future<void> setPending(int userId, String stepUrl) async {
-    map[userId] = stepUrl;
+  Future<void> setPending(int userId, int chatId, String stepUrl) async {
+    map['$chatId-$userId'] = stepUrl;
   }
 }

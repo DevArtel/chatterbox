@@ -28,7 +28,7 @@ class Chatterbox {
         if (message.isCommand) {
           processCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process command /$command');
-            await store.clearPending(messageContext.userId);
+            await store.clearPending(messageContext.userId, messageContext.chatId);
             _handleCommand(command, messageContext);
           });
         } else {
@@ -48,7 +48,7 @@ class Chatterbox {
         }
         processCommand(ctx.update, (messageContext, command) async {
           print('[Chatterbox] Process command /$command');
-          await store.clearPending(messageContext.userId);
+          await store.clearPending(messageContext.userId, messageContext.chatId);
           _handleCommand(command, messageContext);
         });
       },

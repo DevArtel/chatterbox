@@ -16,8 +16,8 @@ class FirebaseDialogStore implements PendingMessagesStore {
   }
 
   @override
-  Future<String?> retrievePending(int userId) async {
-    final ref = collection.document('$userId');
+  Future<String?> retrievePending(int userId, int chatId) async {
+    final ref = collection.document('$chatId-$userId');
 
     if (!(await ref.exists)) {
       return null;
@@ -32,10 +32,10 @@ class FirebaseDialogStore implements PendingMessagesStore {
   }
 
   @override
-  Future<void> setPending(int userId, String stepUrl) async => collection.document('$userId').update({
+  Future<void> setPending(int userId, int chatId, String stepUrl) async => collection.document('$chatId-$userId').update({
         _fieldPendingStepUri: stepUrl,
       });
 
   @override
-  Future<void> clearPending(int userId) => collection.document('$userId').delete();
+  Future<void> clearPending(int userId, int chatId) => collection.document('$chatId-$userId').delete();
 }

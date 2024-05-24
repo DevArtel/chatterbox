@@ -27,12 +27,12 @@ class FlowManagerImpl implements FlowManager {
   @override
   Future<bool> handle(MessageContext messageContext, [StepUri? stepUri]) async {
     final userId = messageContext.userId;
-    final editMessageId = messageContext.editMessageId;
+    final chatId = messageContext.chatId;
 
     final withMessage = messageContext.text == null ? "without message" : "with message '${messageContext.text}'";
     print("Handle invoked by $userId in ${messageContext.source.name}:${messageContext.chatId}: $withMessage");
 
-    final String? pendingStepUrl = await _processPending(stepUri, userId);
+    final String? pendingStepUrl = await _processPending(stepUri, userId, chatId);
     final pendingData = FlowStep.fromUri(pendingStepUrl, allStepsByUri);
     final pendingStep = pendingData.$1;
     final pendingArgs = pendingData.$2;
@@ -75,12 +75,12 @@ class FlowManagerImpl implements FlowManager {
 
   /// StepUri overrides pending.
   /// If user presented with an option to submit text or press button button is primary
-  Future<String?> _processPending(StepUri? stepUri, int userId) async {
+  Future<String?> _processPending(StepUri? stepUri, int userId, int chatId) async {
     if (stepUri != null) {
-      await store.clearPending(userId);
+      await store.clearPending(userId, chatId);
       return null;
     } else {
-      return store.retrievePending(userId);
+      return store.retrievePending(userId, chatId);
     }
   }
 
@@ -100,7 +100,7 @@ class FlowManagerImpl implements FlowManager {
         final ReactionResponse reactionResponse => () async {
             final uri = result.afterReplyUri;
             if (uri != null) {
-              await store.setPending(messageContext.userId, uri);
+              await store.setPending(messageContext.userId, messageContext. chatId, uri);
             }
             return bot.replyWithButtons(
               messageContext.chatId,

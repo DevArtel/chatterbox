@@ -1,3 +1,7 @@
+## 1.7.0
+
+- Interacting with bot in groups by adding chatId to stored step uri from afterReplyUri
+
 ## 1.6.0
 
 - Override pendingUri, when stepUri is provided. This allows to provide user with both InlineButton and text input
