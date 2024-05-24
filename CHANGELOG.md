@@ -1,6 +1,7 @@
 ## 1.7.0
 
-- Interacting with bot in groups by adding chatId to stored step uri from afterReplyUri
+- Group Interactions: Added support for bot interactions within Telegram groups.
+- Admin-Only Steps: Introduced FlowStep#requireAdmin to restrict certain steps to group admins (enabled by default).
 
 ## 1.6.0
 
