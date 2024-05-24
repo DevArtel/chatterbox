@@ -19,6 +19,8 @@ abstract class BotFacade {
   Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons, bool markdown);
 
   Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri, int? editMessageId);
+
+  Future<List<int>> getChatAdmins(int chatId);
 }
 
 class BotFacadeImpl extends BotFacade {
@@ -123,6 +125,13 @@ class BotFacadeImpl extends BotFacade {
       await api.deleteMessage(ChatID(chatId), editMessageId);
     }
     return message.messageId;
+  }
+
+  @override
+  Future<List<int>> getChatAdmins(int chatId) {
+    return api.getChatAdministrators(ChatID(chatId)).then(
+          (value) => value.map((e) => e.user.id).toList(),
+        );
   }
 }
 

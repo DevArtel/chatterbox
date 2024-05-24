@@ -38,6 +38,14 @@ extension ListStringExtensions on List<String> {
 abstract class FlowStep {
   String get uri => runtimeType.toStepUri();
 
+  //TODO: In future we might want to enable more granular check with ChatMemberStatus(creator, administrator, member)
+  /// Indicates whether this step requires the user to be a group administrator
+  /// when interacting within a group chat.
+  ///
+  /// Defaults to `false`. If set to `true`, only users with administrator
+  /// In individual chats, this property has no effect.
+  bool get requireAdmin => true;
+
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]);
 
   static (FlowStep?, List<String>?) fromUri(StepUri? pendingStepUri, List<FlowStep> allSteps) {

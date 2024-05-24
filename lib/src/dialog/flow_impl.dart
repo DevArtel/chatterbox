@@ -14,15 +14,18 @@ abstract class FlowManager {
 typedef StepFactory = FlowStep Function();
 
 class FlowManagerImpl implements FlowManager {
-  final BotFacade bot;
-  final PendingMessagesStore store;
-  final List<Flow> flows;
+  FlowManagerImpl(this._bot, this._store, this._flows);
 
-  FlowManagerImpl(this.bot, this.store, this.flows);
+  final BotFacade _bot;
+  final PendingMessagesStore _store;
+  final List<Flow> _flows;
 
   @override
-  List<FlowStep> get allStepsByUri =>
-      flows.map((flow) => flow.steps).expand((steps) => steps).map((step) => step()).toList();
+  List<FlowStep> get allStepsByUri => _flows
+      .map((flow) => flow.steps)
+      .expand((steps) => steps)
+      .map((step) => step())
+      .toList();
 
   @override
   Future<bool> handle(MessageContext messageContext, [StepUri? stepUri]) async {
@@ -38,7 +41,7 @@ class FlowManagerImpl implements FlowManager {
     final pendingArgs = pendingData.$2;
 
     if (pendingStep == null && stepUri == null) {
-      final Flow? handlingFlow = flows.firstWhereOrNull((flow) => flow.willHandle(messageContext));
+      final Flow? handlingFlow = _flows.firstWhereOrNull((flow) => flow.willHandle(messageContext));
       if (handlingFlow != null) {
         processResult(handlingFlow.initialStep, null, messageContext);
         print("[FlowManager] Handle by ${handlingFlow.runtimeType}");
@@ -77,15 +80,24 @@ class FlowManagerImpl implements FlowManager {
   /// If user presented with an option to submit text or press button button is primary
   Future<String?> _processPending(StepUri? stepUri, int userId, int chatId) async {
     if (stepUri != null) {
-      await store.clearPending(userId, chatId);
+      await _store.clearPending(userId, chatId);
       return null;
     } else {
-      return store.retrievePending(userId, chatId);
+      return _store.retrievePending(userId, chatId);
     }
   }
 
   Future<void> processResult(FlowStep flowStep, List<String>? args, MessageContext messageContext) async {
     try {
+      if (messageContext.chatId < 0 && flowStep.requireAdmin) {
+        /// Check if user is admin in the group
+        final isAdmin = await _verifyAdmin(messageContext.chatId, messageContext.userId);
+        if (!isAdmin) {
+          print(
+              '[FlowManager] ⚠️User ${messageContext.userId} is not an admin in chat ${messageContext.chatId}. To enable non admins to use the bot in groups, set requireAdmin to false in the flow step.');
+          return;
+        }
+      }
       final reaction = await flowStep.handle(messageContext, args);
       final int? responseMessageId = await _react(reaction, messageContext);
       reaction.postCallback?.call(responseMessageId);
@@ -100,9 +112,9 @@ class FlowManagerImpl implements FlowManager {
         final ReactionResponse reactionResponse => () async {
             final uri = result.afterReplyUri;
             if (uri != null) {
-              await store.setPending(messageContext.userId, messageContext. chatId, uri);
+              await _store.setPending(messageContext.userId, messageContext.chatId, uri);
             }
-            return bot.replyWithButtons(
+            return _bot.replyWithButtons(
               messageContext.chatId,
               reactionResponse.editMessageId,
               reactionResponse.text,
@@ -116,7 +128,7 @@ class FlowManagerImpl implements FlowManager {
             final args = stepData.$2;
             final text = reactionRedirect.text;
             final sendMessageId = text != null
-                ? bot.replyWithButtons(
+                ? _bot.replyWithButtons(
                     messageContext.userId,
                     reactionRedirect.editMessageId,
                     text,
@@ -128,7 +140,7 @@ class FlowManagerImpl implements FlowManager {
             return sendMessageId;
           }(),
         (final ReactionInvoice reactionInvoice) => () {
-            final sendMessageId = bot.sendInvoice(
+            final sendMessageId = _bot.sendInvoice(
               reactionInvoice.chatId,
               reactionInvoice.invoiceInfo,
               reactionInvoice.preCheckoutUri,
@@ -138,7 +150,7 @@ class FlowManagerImpl implements FlowManager {
           }(),
         (final ReactionForeignResponse reaction) =>
           // final reactionForeignResponse = result as ReactionForeignResponse;
-          bot.replyWithButtons(
+          _bot.replyWithButtons(
             reaction.foreignUserId,
             reaction.editMessageId,
             reaction.text,
@@ -156,4 +168,9 @@ class FlowManagerImpl implements FlowManager {
         // ignore: unreachable_switch_case
         _ => throw Exception("Unknown Reaction type: ${result.runtimeType}"),
       };
+
+  Future<bool> _verifyAdmin(int chatId, int userId) async {
+    final admins = await _bot.getChatAdmins(chatId);
+    return admins.contains(userId);
+  }
 }
