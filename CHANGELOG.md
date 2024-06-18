@@ -1,3 +1,7 @@
+## 1.8.0
+
+- Add `showLinkPreview` that allows to control whether link previews should be shown for links in the message.
+
 ## 1.7.1
 
 - Fix: Negative int values cannot be used as args between steps

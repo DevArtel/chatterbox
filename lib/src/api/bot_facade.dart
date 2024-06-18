@@ -6,7 +6,13 @@ import 'package:televerse/televerse.dart';
 typedef JsonData = Map<String, dynamic>;
 
 abstract class BotFacade {
-  Future<int> sendMessage(int chatId, String text, {required InlineKeyboardMarkup replyMarkup, required bool markdown});
+  Future<int> sendMessage(
+    int chatId,
+    String text, {
+    required InlineKeyboardMarkup replyMarkup,
+    required bool markdown,
+    bool showLinkPreview = false,
+  });
 
   Future<int> editMessageText(
     int chatId,
@@ -14,11 +20,24 @@ abstract class BotFacade {
     required String text,
     required InlineKeyboardMarkup replyMarkup,
     required bool markdown,
+    bool showLinkPreview = false,
   });
 
-  Future<int> replyWithButtons(int chatId, int? editMessageId, String text, List<InlineButton> buttons, bool markdown);
+  Future<int> replyWithButtons(
+    int chatId,
+    int? editMessageId,
+    String text,
+    List<InlineButton> buttons,
+    bool markdown, {
+    bool showLinkPreview = false,
+  });
 
-  Future<int> sendInvoice(int chatId, InvoiceInfo invoiceInfo, String preCheckoutUri, int? editMessageId);
+  Future<int> sendInvoice(
+    int chatId,
+    InvoiceInfo invoiceInfo,
+    String preCheckoutUri,
+    int? editMessageId,
+  );
 
   Future<List<int>> getChatAdmins(int chatId);
 }
@@ -34,12 +53,14 @@ class BotFacadeImpl extends BotFacade {
     String text, {
     required InlineKeyboardMarkup replyMarkup,
     required bool markdown,
+    bool showLinkPreview = false,
   }) async {
     final message = await api.sendMessage(
       ChatID(chatId),
       text,
       replyMarkup: replyMarkup,
       parseMode: markdown ? ParseMode.markdown : null,
+      linkPreviewOptions: LinkPreviewOptions(isDisabled: !showLinkPreview),
     );
     return message.messageId;
   }
@@ -51,6 +72,7 @@ class BotFacadeImpl extends BotFacade {
     required String text,
     required InlineKeyboardMarkup replyMarkup,
     required bool markdown,
+    bool showLinkPreview = false,
   }) async {
     final message = await api.editMessageText(
       ChatID(chatId),
@@ -58,17 +80,30 @@ class BotFacadeImpl extends BotFacade {
       text,
       replyMarkup: replyMarkup,
       parseMode: markdown ? ParseMode.markdown : null,
+      linkPreviewOptions: LinkPreviewOptions(isDisabled: !showLinkPreview),
     );
     return message.messageId;
   }
 
   @override
   Future<int> replyWithButtons(
-      int chatId, int? editMessageId, String text, List<InlineButton> buttons, bool markdown) async {
+    int chatId,
+    int? editMessageId,
+    String text,
+    List<InlineButton> buttons,
+    bool markdown, {
+    bool showLinkPreview = false,
+  }) async {
     _verifyButtons(buttons);
     if (editMessageId == null) {
       print("[ChatUtils] replyWithButtons new message");
-      return sendMessage(chatId, text, replyMarkup: createButtons(buttons), markdown: markdown);
+      return sendMessage(
+        chatId,
+        text,
+        replyMarkup: createButtons(buttons),
+        markdown: markdown,
+        showLinkPreview: showLinkPreview,
+      );
     } else {
       print("[ChatUtils] replyWithButtons edit message with id: $editMessageId");
       return editMessageText(
@@ -77,6 +112,7 @@ class BotFacadeImpl extends BotFacade {
         text: text,
         replyMarkup: createButtons(buttons),
         markdown: markdown,
+        showLinkPreview: showLinkPreview,
       );
     }
   }
