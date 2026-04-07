@@ -122,13 +122,13 @@ class FlowManagerImpl implements FlowManager {
               reactionResponse.markdown,
             );
           }(),
-        (final ReactionRedirect reactionRedirect) => () {
+        (final ReactionRedirect reactionRedirect) => () async {
             final stepData = FlowStep.fromUri(reactionRedirect.stepUri, allStepsByUri);
             final step = stepData.$1;
             final args = stepData.$2;
             final text = reactionRedirect.text;
             final sendMessageId = text != null
-                ? _bot.replyWithButtons(
+                ? await _bot.replyWithButtons(
                     messageContext.userId,
                     reactionRedirect.editMessageId,
                     text,
@@ -136,7 +136,7 @@ class FlowManagerImpl implements FlowManager {
                     reactionRedirect.markdown,
                   )
                 : null;
-            processResult(step!, args, messageContext);
+            await processResult(step!, args, messageContext);
             return sendMessageId;
           }(),
         (final ReactionInvoice reactionInvoice) => () {
@@ -159,7 +159,7 @@ class FlowManagerImpl implements FlowManager {
           ),
         (final ReactionComposed reactionComposed) => () async {
             for (var response in reactionComposed.responses) {
-              _react(response, messageContext);
+              await _react(response, messageContext);
               await Future.delayed(Duration(milliseconds: 300));
             }
             return null;
