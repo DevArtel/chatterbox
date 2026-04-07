@@ -123,12 +123,12 @@ class BotFacadeImpl extends BotFacade {
 
     final message = await api.sendInvoice(
       ChatID(chatId),
-      title: invoiceInfo.title,
-      description: invoiceInfo.description,
-      payload: preCheckoutUri,
+      invoiceInfo.title,
+      invoiceInfo.description,
+      preCheckoutUri,
+      invoiceInfo.currency,
+      invoiceInfo.prices,
       providerToken: invoiceInfo.providerToken,
-      currency: invoiceInfo.currency,
-      prices: invoiceInfo.prices,
       messageThreadId: invoiceInfo.messageThreadId,
       maxTipAmount: invoiceInfo.maxTipAmount,
       suggestedTipAmounts: invoiceInfo.suggestedTipAmounts,

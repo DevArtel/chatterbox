@@ -4,7 +4,7 @@ import 'package:televerse/televerse.dart';
 
 typedef SuccessfulPaymentHandler = FutureOr<void> Function(Context ctx);
 
-extension TeleverseExtensions on Televerse {
+extension TeleverseExtensions on Bot {
   void onSuccessfulPayment(SuccessfulPaymentHandler handler) {
     filter(
       (ctx) => ctx.message?.successfulPayment != null,

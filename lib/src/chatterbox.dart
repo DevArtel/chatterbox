@@ -25,7 +25,8 @@ class Chatterbox {
         if (message == null) {
           return;
         }
-        if (message.isCommand) {
+        final isCommand = message.entities?.any((e) => e.type == MessageEntityType.botCommand) ?? false;
+        if (isCommand) {
           processCommand(ctx.update, (messageContext, command) async {
             print('[Chatterbox] Process command /$command');
             await store.clearPending(messageContext.userId, messageContext.chatId);

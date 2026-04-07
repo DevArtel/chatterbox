@@ -1,7 +1,6 @@
 import 'package:chatterbox/src/model/media_file.dart';
 import 'package:chatterbox/src/model/sticker_model.dart';
 import 'package:televerse/telegram.dart';
-import 'package:televerse/televerse.dart';
 
 enum Source {
   private,

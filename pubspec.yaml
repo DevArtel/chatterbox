@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   # APIs
-  televerse: ^1.15.12
+  televerse: ^3.3.0
 
   # Utils
   collection: ^1.18.0
