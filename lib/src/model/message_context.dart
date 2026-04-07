@@ -27,7 +27,6 @@ class MessageContext {
 
   Source get source {
     final chatType = original?.chat.type;
-    ChatType.private;
     return switch (chatType) {
       ChatType.sender || ChatType.private => Source.private,
       ChatType.supergroup || ChatType.group => Source.group,
