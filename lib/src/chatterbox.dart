@@ -5,17 +5,17 @@ import 'package:chatterbox/src/api/bot_facade.dart';
 import 'package:chatterbox/src/utils/chat_utils.dart';
 import 'package:chatterbox/src/utils/update_processing_utils.dart';
 import 'package:collection/collection.dart';
+import 'package:chatterbox/src/utils/webhook_bot.dart';
 import 'package:televerse/telegram.dart';
-import 'package:televerse/televerse.dart';
 
 class Chatterbox {
   final List<Flow> flows;
 
-  final Bot _bot;
+  final WebhookBot _bot;
   final PendingMessagesStore store;
   late final FlowManager _flowManager;
 
-  Chatterbox({required String botToken, required this.flows, required this.store}) : _bot = Bot(botToken) {
+  Chatterbox({required String botToken, required this.flows, required this.store}) : _bot = WebhookBot(botToken) {
     _flowManager = FlowManagerImpl(BotFacadeImpl(_bot.api), store, flows);
 
     _bot.onText(
@@ -133,11 +133,11 @@ class Chatterbox {
     _bot.start();
   }
 
-  void invokeFromWebhook(Map<String, dynamic> updateJson) {
+  Future<void> invokeFromWebhook(Map<String, dynamic> updateJson) async {
     print('[Chatterbox] Received update from webhook: $updateJson');
     try {
       final update = Update.fromJson(updateJson);
-      _bot.handleUpdate(update);
+      await _bot.processWebhookUpdate(update);
     } catch (error, stacktrace) {
       print('[Chatterbox] invokeFromWebhook failed: ${error.toString()}\n$stacktrace');
     }
