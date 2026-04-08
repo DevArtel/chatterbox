@@ -18,7 +18,7 @@ class StickerModel extends MediaFile {
     this.emoji,
     this.setName,
   }) : super(
-          type: MediaFileType.photo,
+          type: MediaFileType.sticker,
           fileId: fileId,
           fileUniqueId: fileUniqueId,
           width: width,
